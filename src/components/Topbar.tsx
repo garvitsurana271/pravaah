@@ -4,7 +4,7 @@ import { clock } from './format'
 
 const SPEEDS: Speed[] = [1, 2, 4, 8]
 
-export function Topbar({ ctl }: { ctl: SimController }) {
+export function Topbar({ ctl, onStartTour, tourActive }: { ctl: SimController; onStartTour: () => void; tourActive: boolean }) {
   return (
     <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b hairline bg-panel/60 px-4 py-2.5 backdrop-blur">
       {/* brand */}
@@ -76,6 +76,14 @@ export function Topbar({ ctl }: { ctl: SimController }) {
             </button>
           ))}
         </div>
+        {!tourActive && (
+          <button
+            onClick={onStartTour}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-signal-green/40 bg-signal-green/10 px-2.5 py-1.5 text-[11px] font-semibold text-signal-green transition-colors hover:bg-signal-green/20"
+          >
+            <Play size={13} /> Guided Demo
+          </button>
+        )}
       </div>
 
       {/* the hero toggle */}

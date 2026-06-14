@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useSimulation } from './state/useSimulation'
+import { useTour } from './state/useTour'
+import { TourOverlay, TourNudge } from './components/TourOverlay'
 import { Topbar } from './components/Topbar'
 import { Kpis } from './components/Kpis'
 import { CorridorView } from './components/CorridorView'
@@ -15,10 +17,16 @@ const LEGEND_CLASSES = ['SPECIAL', 'SUPERFAST', 'EXPRESS', 'PASSENGER', 'GOODS']
 export default function App() {
   const ctl = useSimulation()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const tour = useTour(ctl, setSelectedId)
+  const [nudge, setNudge] = useState(true)
 
   return (
     <div className="flex h-screen min-h-0 flex-col overflow-hidden">
-      <Topbar ctl={ctl} />
+      <Topbar ctl={ctl} onStartTour={() => { setNudge(false); tour.start() }} tourActive={tour.active} />
+      {nudge && !tour.active && (
+        <TourNudge onStart={() => { setNudge(false); tour.start() }} onDismiss={() => setNudge(false)} />
+      )}
+      <TourOverlay caption={tour.caption} onStop={tour.stop} />
 
       <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-auto p-3 lg:grid-cols-[1fr_minmax(360px,400px)] lg:overflow-hidden">
         {/* left column */}
