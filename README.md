@@ -36,6 +36,10 @@ Open the live link and you are looking at a real, congested stretch of the South
 - The trains on the board are **real services that run this corridor** (Purushottam SF Express, Sri Jagannath Express, Puri-Howrah Garib Rath, and others), pulled from the open railway timetable. We arranged their directions and gaps into one peak window so they interact on screen, and the two goods rakes are synthetic because freight runs no public timetable.
 - The live movement is a deterministic **simulation**. We are explicit about this: Indian Railways has no open real-time position feed, so nobody can do live positions without faking them. A simulation is also the only way to re-stage the exact 2023 failure and run a fair AI-versus-manual comparison. The engine is built to sit on top of a real feed the day a railway grants access.
 
+![The corridor on the map](docs/screenshots/corridor-map.png)
+
+*Zoom into the corridor from the national view: the real Kharagpur–Bhadrak section on the map of eastern India, single-line crossings marked, live trains coloured by status.*
+
 ## The result
 
 On the peak scenario, the AI optimizer against the manual first-come-first-served baseline:
