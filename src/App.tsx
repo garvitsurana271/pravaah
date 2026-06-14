@@ -44,10 +44,12 @@ export default function App() {
       <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-auto p-3 lg:grid-cols-[1fr_minmax(360px,400px)] lg:overflow-hidden">
         {/* left column */}
         <div className="flex min-h-0 flex-col gap-3">
-          <Kpis optimizer={ctl.optimizer} fcfs={ctl.fcfs} optimizerOn={ctl.optimizerOn} projected={ctl.projected} />
+          <div className="panel-in">
+            <Kpis optimizer={ctl.optimizer} fcfs={ctl.fcfs} optimizerOn={ctl.optimizerOn} projected={ctl.projected} />
+          </div>
 
           {/* hero board */}
-          <section className="panel-card flex min-h-[360px] flex-1 flex-col overflow-hidden">
+          <section className="panel-card panel-in flex min-h-[360px] flex-1 flex-col overflow-hidden" style={{ animationDelay: '80ms' }}>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b hairline px-4 py-2.5">
               <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink">Live Section Control Board</span>
               <span className="text-[11px] text-muted">{BALASORE_CORRIDOR.subtitle}</span>
@@ -76,7 +78,7 @@ export default function App() {
           </section>
 
           {/* bottom row */}
-          <div className="grid h-[300px] shrink-0 grid-cols-1 gap-3 md:grid-cols-[1.15fr_0.85fr_1fr]">
+          <div className="grid h-[300px] shrink-0 grid-cols-1 gap-3 panel-in md:grid-cols-[1.15fr_0.85fr_1fr]" style={{ animationDelay: '160ms' }}>
             <TrainTable snap={ctl.primary} selectedId={selectedId} onSelect={setSelectedId} />
             <GeoMap snap={ctl.primary} />
             <EventLog snap={ctl.primary} />
@@ -84,7 +86,7 @@ export default function App() {
         </div>
 
         {/* right rail — the glass box */}
-        <aside className="min-h-0 lg:h-full">
+        <aside className="panel-in min-h-0 lg:h-full" style={{ animationDelay: '240ms' }}>
           <DispatcherPanel snap={ctl.primary} optimizerOn={ctl.optimizerOn} selectedId={selectedId} />
         </aside>
       </main>

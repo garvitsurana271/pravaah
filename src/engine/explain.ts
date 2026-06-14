@@ -124,21 +124,37 @@ export function answerQuestion(
     }
   }
 
-  if (ref) {
-    const d = decisions.find((x) => x.trainIds.includes(ref.id))
-    if (d && (isWhy || isDelay || isOverride || true)) {
-      const exp = explainDecision(d, lookup)
-      if (isOverride && d.options.length > 1) {
-        const chosen = d.options.find((o) => sameOrder(o.order, d.chosenOrder))!
-        const alt = d.options.find((o) => !sameOrder(o.order, d.chosenOrder))!
-        const extra = (alt.weightedCostSec - chosen.weightedCostSec) / 60
+  // Which decision to talk about: the referenced train's, or — for a bare
+  // "why this call" / "what if I override" — the most recent decision on the board.
+  const d = ref
+    ? decisions.find((x) => x.trainIds.includes(ref.id))
+    : isWhy || isOverride || isDelay
+      ? decisions.find((x) => x.kind !== 'PROCEED')
+      : undefined
+
+  if (d) {
+    const exp = explainDecision(d, lookup)
+    if (isOverride && d.options.length > 1) {
+      const chosen = d.options.find((o) => sameOrder(o.order, d.chosenOrder))!
+      const alt = d.options.find((o) => !sameOrder(o.order, d.chosenOrder))!
+      const extra = (alt.weightedCostSec - chosen.weightedCostSec) / 60
+      const lead = lookup.get(d.chosenOrder[0])?.number ?? d.chosenOrder[0]
+      const held = d.chosenOrder.slice(1).map((id) => lookup.get(id)?.number ?? id).join(', ') || 'the held train'
+      if (extra < 0.5) {
         return {
           refDecisionId: d.id,
-          text: `If you override and reverse precedence for ${ref.number}, total weighted delay rises by about ${extra.toFixed(1)} weighted-min. You would be holding a higher-priority service to let a lower one go first. You can do it; the controller stays in charge. The number is just there so the call is yours, not the machine's.`,
+          text: `At ${d.stationId.toUpperCase()}, ${lead} and ${held} are evenly matched, so letting ${held} go first costs almost no extra delay. This one is genuinely the controller's call, and you can make it.`,
         }
       }
-      return { refDecisionId: d.id, text: `${exp.headline}. ${exp.rationale.slice(0, 3).join(' ')}` }
+      return {
+        refDecisionId: d.id,
+        text: `If you override and let ${held} go ahead of ${lead} at ${d.stationId.toUpperCase()}, total weighted delay rises by about ${extra.toFixed(1)} weighted-min. You would be holding a higher-priority service for a lower one. You can do it; the controller stays in charge, this is just the cost so the call is yours.`,
+      }
     }
+    return { refDecisionId: d.id, text: `${exp.headline}. ${exp.rationale.slice(0, 3).join(' ')}` }
+  }
+
+  if (ref) {
     const st = ref.state.toLowerCase()
     const late = ref.delaySec > 30 ? ` It has lost ${mins(ref.delaySec)} min so far.` : ' It is on time.'
     return { text: `${ref.number} (${CLASS_META[ref.cls].label}) is currently ${st}, bound for ${ref.destCode}.${late} No open dispatch decision references it right now.` }

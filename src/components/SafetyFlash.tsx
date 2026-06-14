@@ -7,7 +7,7 @@ export function SafetyFlash({ show }: { show: boolean }) {
   return (
     <div className="pointer-events-none fixed inset-0 z-[60] grid place-items-center bg-black/55 backdrop-blur-[2px]">
       <div
-        className="panel-card animate-rise max-w-xl px-10 py-7 text-center"
+        className="panel-card flash-pop max-w-xl px-10 py-7 text-center"
         style={{ borderColor: '#ff4d4d', boxShadow: '0 0 80px rgba(255,77,77,0.45)' }}
       >
         <ShieldAlert size={46} className="mx-auto text-signal-red glow-red" />

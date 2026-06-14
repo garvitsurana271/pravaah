@@ -5,7 +5,31 @@
 :root {
   color-scheme: dark;
   --grid: rgba(58, 160, 255, 0.06);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: linear(0, 0.006, 0.083 4.8%, 0.32 11%, 0.56, 0.77, 0.94 32%, 1.02, 1.06 41%, 1.06, 1.04, 1.01 58%, 0.999, 1);
 }
+
+/* tactile press feedback on every control */
+button {
+  transition: transform 0.12s var(--ease-out), background-color 0.16s var(--ease-standard),
+    border-color 0.16s var(--ease-standard), color 0.16s var(--ease-standard);
+}
+button:active {
+  transform: scale(0.97);
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.panel-in { animation: panelIn 0.45s var(--ease-out) both; }
+
+@keyframes flashPop {
+  from { opacity: 0; transform: scale(0.93); }
+  to { opacity: 1; transform: scale(1); }
+}
+.flash-pop { animation: flashPop 0.5s var(--spring) both; }
 
 html,
 body,
@@ -94,5 +118,11 @@ body {
 .animate-rise { animation: riseIn 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-blip, .animate-dash, .animate-rise { animation: none !important; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

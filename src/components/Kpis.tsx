@@ -1,6 +1,7 @@
 import { ShieldCheck } from 'lucide-react'
 import type { Snapshot } from '../engine/simulation'
 import type { Projected } from '../state/useSimulation'
+import { useCountUp } from './useCountUp'
 import { minsInt } from './format'
 
 export function Kpis({ optimizer, fcfs, optimizerOn, projected }: { optimizer: Snapshot; fcfs: Snapshot; optimizerOn: boolean; projected: Projected }) {
@@ -9,6 +10,7 @@ export function Kpis({ optimizer, fcfs, optimizerOn, projected }: { optimizer: S
   const fcW = fcfs.kpis.totalWeightedDelaySec
   const maxW = Math.max(optW, fcW, 1)
   const refused = k.unsafeAdmissionsPrevented
+  const animPct = Math.round(useCountUp(projected.pct))
 
   return (
     <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.55fr_1fr]">
@@ -18,7 +20,7 @@ export function Kpis({ optimizer, fcfs, optimizerOn, projected }: { optimizer: S
           <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted">AI vs manual dispatching · live</div>
           <div className="mt-0.5 flex items-baseline gap-2.5">
             <span className="tabular text-[68px] font-bold leading-none text-signal-green" style={{ textShadow: '0 0 44px rgba(34,211,122,0.35)' }}>
-              {projected.pct}%
+              {animPct}%
             </span>
             <span className="text-lg font-semibold text-ink">less delay</span>
           </div>
