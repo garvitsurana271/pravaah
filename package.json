@@ -2,6 +2,7 @@
   "name": "pravaah",
   "private": true,
   "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "description": "Pravaah — The Glass-Box Dispatcher: an open, explainable, real-time train re-dispatch decision-support copilot for the Indian Railways section controller.",
   "scripts": {

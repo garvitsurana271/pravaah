@@ -13,7 +13,7 @@ prs.slide_width = Inches(13.333)
 prs.slide_height = Inches(7.5)
 BLANK = prs.slide_layouts[6]
 
-for i in range(1, 10):
+for i in range(1, 11):
     path = os.path.join(ROOT, f"slide-preview-{i}.png")
     if not os.path.exists(path):
         raise SystemExit(f"missing {path} (render public/slides.html first)")

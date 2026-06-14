@@ -34,3 +34,5 @@ kaggle2.md
 vite.config.js
 vite.config.d.ts
 *.tsbuildinfo
+/*.jpeg
+/*.jpg

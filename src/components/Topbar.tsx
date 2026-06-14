@@ -1,5 +1,6 @@
 import { Pause, Play, RotateCcw } from 'lucide-react'
 import type { SimController, Speed } from '../state/useSimulation'
+import { Logo } from './Logo'
 import { clock } from './format'
 
 const SPEEDS: Speed[] = [1, 2, 4, 8]
@@ -9,12 +10,8 @@ export function Topbar({ ctl, onStartTour, tourActive }: { ctl: SimController; o
     <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b hairline bg-panel/60 px-4 py-2.5 backdrop-blur">
       {/* brand */}
       <div className="flex items-center gap-3">
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-black/30 ring-1 ring-signal-green/30">
-          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden>
-            <rect x="8.6" y="2.5" width="2.8" height="15" rx="1.4" fill="#2a3a57" />
-            <circle cx="10" cy="6" r="2.7" fill="#22d37a" style={{ filter: 'drop-shadow(0 0 4px #22d37a)' }} />
-            <circle cx="10" cy="13.2" r="2.7" fill="#ff4d4d" opacity="0.3" />
-          </svg>
+        <div className="grid h-10 w-10 place-items-center rounded-xl bg-black/40 ring-1 ring-signal-green/25">
+          <Logo size={26} />
         </div>
         <div className="leading-tight">
           <div className="flex items-baseline gap-2">

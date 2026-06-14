@@ -1,4 +1,5 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { Maximize2, Minimize2 } from 'lucide-react'
 import type { Snapshot } from '../engine/simulation'
 import { BALASORE_CORRIDOR } from '../engine/corridor'
 import { CLASS_META } from '../engine/priorities'
@@ -10,7 +11,6 @@ const INDIA = indiaRaw as [number, number][]
 const W = 300
 const H = 330
 const M = 14
-// India bounding box (matches the generator).
 const LON0 = 68
 const LON1 = 98
 const LAT0 = 6
@@ -22,36 +22,43 @@ const stations = BALASORE_CORRIDOR.stations
 const edges = BALASORE_CORRIDOR.edges
 const byId = new Map(stations.map((s) => [s.id, s]))
 
-// Static layers (national dots + our corridor) — built once, never re-diffed.
 const nationalDots = INDIA.map(([lon, lat]) => `M${px(lon).toFixed(1)} ${py(lat).toFixed(1)}l.01 0`).join('')
 const corridorPath = stations.map((s) => `${px(s.lon).toFixed(1)},${py(s.lat).toFixed(1)}`).join(' ')
-const cx0 = px(stations[0].lon)
-const cy0 = py(stations[0].lat)
-const cxN = px(stations[stations.length - 1].lon)
-const cyN = py(stations[stations.length - 1].lat)
+
+// view boxes: whole country, and zoomed onto the Balasore corridor
+const FULL: [number, number, number, number] = [0, 0, W, H]
+const cxs = stations.map((s) => px(s.lon))
+const cys = stations.map((s) => py(s.lat))
+const ccx = (Math.min(...cxs) + Math.max(...cxs)) / 2
+const ccy = (Math.min(...cys) + Math.max(...cys)) / 2
+const FOCUS: [number, number, number, number] = [ccx - 28, ccy - 31, 56, 62]
+const easeOutCubic = (k: number) => 1 - Math.pow(1 - k, 3)
 
 export function GeoMap({ snap }: { snap: Snapshot }) {
-  const backdrop = useMemo(
-    () => (
-      <g>
-        <path d={nationalDots} stroke="rgba(150,172,208,0.55)" strokeWidth={1.6} strokeLinecap="round" fill="none" />
-        {/* highlight ring around our section */}
-        <circle cx={(cx0 + cxN) / 2} cy={(cy0 + cyN) / 2} r={26} fill="none" stroke="rgba(34,211,122,0.35)" strokeWidth={1} />
-        <polyline points={corridorPath} fill="none" stroke="#22d37a" strokeWidth={2} style={{ filter: 'drop-shadow(0 0 4px #22d37a)' }} />
-        {stations.map((s) => (
-          <circle key={s.id} cx={px(s.lon)} cy={py(s.lat)} r={s.isJunction ? 2.6 : 1.8} fill="#0b1422" stroke="#e6edf7" strokeWidth={1} />
-        ))}
-        <line x1={(cx0 + cxN) / 2 + 26} y1={(cy0 + cyN) / 2} x2={W - 64} y2={70} stroke="rgba(34,211,122,0.4)" strokeWidth={0.75} />
-        <text x={W - 62} y={64} className="fill-signal-green" fontSize={8.5} fontFamily="Fira Code">
-          Bahanaga Bazar /
-        </text>
-        <text x={W - 62} y={74} className="fill-signal-green" fontSize={8.5} fontFamily="Fira Code">
-          Balasore section
-        </text>
-      </g>
-    ),
-    [],
-  )
+  const [focused, setFocused] = useState(false)
+  const [vb, setVb] = useState<number[]>(FULL)
+  const vbRef = useRef<number[]>(FULL)
+  vbRef.current = vb
+  const raf = useRef<number>(0)
+
+  const tween = (to: number[]) => {
+    const from = vbRef.current
+    const start = performance.now()
+    const step = (t: number) => {
+      const k = Math.min(1, (t - start) / 600)
+      const e = easeOutCubic(k)
+      setVb(from.map((f, i) => f + (to[i] - f) * e))
+      if (k < 1) raf.current = requestAnimationFrame(step)
+    }
+    cancelAnimationFrame(raf.current)
+    raf.current = requestAnimationFrame(step)
+  }
+
+  const toggle = (next?: boolean) => {
+    const nf = next ?? !focused
+    setFocused(nf)
+    tween(nf ? FOCUS : FULL)
+  }
 
   const trainPts = useMemo(
     () =>
@@ -73,12 +80,58 @@ export function GeoMap({ snap }: { snap: Snapshot }) {
         <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">Indian Railways Network</span>
         <span className="tabular text-[9px] text-muted">{INDIA.length.toLocaleString()} stations · datameet</span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="min-h-0 flex-1" role="img" aria-label="Live position on the national rail network">
-        {backdrop}
-        {trainPts.map((p) => (
-          <circle key={p.id} cx={p.x} cy={p.y} r={2.4} fill={p.color} style={{ filter: `drop-shadow(0 0 4px ${p.color})` }} />
-        ))}
-      </svg>
+      <div className="relative min-h-0 flex-1">
+        <svg
+          viewBox={vb.join(' ')}
+          className="h-full w-full cursor-pointer"
+          onClick={() => toggle()}
+          role="img"
+          aria-label="National rail network. Click to focus the corridor."
+        >
+          <path d={nationalDots} stroke="rgba(150,172,208,0.55)" strokeWidth={1.6} strokeLinecap="round" fill="none" vectorEffect="non-scaling-stroke" />
+          <circle cx={ccx} cy={ccy} r={26} fill="none" stroke="rgba(34,211,122,0.35)" strokeWidth={1} vectorEffect="non-scaling-stroke" className={focused ? '' : 'animate-blip'} />
+          <polyline points={corridorPath} fill="none" stroke="#22d37a" strokeWidth={2} vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 4px #22d37a)' }} />
+          {stations.map((s) => (
+            <g key={s.id}>
+              <circle cx={px(s.lon)} cy={py(s.lat)} r={focused ? 1.1 : 1.8} fill="#0b1422" stroke="#e6edf7" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+              <text
+                x={px(s.lon) + 1.6}
+                y={py(s.lat) - 1.4}
+                fontSize={2.4}
+                fontFamily="Fira Code"
+                className="fill-ink"
+                style={{ opacity: focused ? 1 : 0, transition: 'opacity 0.4s' }}
+              >
+                {s.code}
+              </text>
+            </g>
+          ))}
+          {!focused && (
+            <>
+              <line x1={ccx + 26} y1={ccy} x2={W - 64} y2={70} stroke="rgba(34,211,122,0.4)" strokeWidth={0.75} />
+              <text x={W - 62} y={64} className="fill-signal-green" fontSize={8.5} fontFamily="Fira Code">
+                Bahanaga Bazar /
+              </text>
+              <text x={W - 62} y={74} className="fill-signal-green" fontSize={8.5} fontFamily="Fira Code">
+                Balasore section
+              </text>
+            </>
+          )}
+          {trainPts.map((p) => (
+            <circle key={p.id} cx={p.x} cy={p.y} r={focused ? 1.1 : 2.4} fill={p.color} style={{ filter: `drop-shadow(0 0 4px ${p.color})` }} />
+          ))}
+        </svg>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            toggle()
+          }}
+          className="absolute right-2 top-2 inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-edge bg-black/55 px-2 py-1 text-[10px] text-muted backdrop-blur transition-colors hover:text-ink"
+        >
+          {focused ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+          {focused ? 'Full network' : 'Focus corridor'}
+        </button>
+      </div>
     </div>
   )
 }
