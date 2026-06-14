@@ -4,6 +4,8 @@
 
 > Built for **FAR AWAY 2026** · Theme: **Railways** · Maps to **Smart India Hackathon problem statement SIH25022** — *"Maximizing section throughput through AI-powered, real-time train traffic control."*
 
+### ▶ Live demo: **https://garvitsurana271.github.io/pravaah/** — runs entirely in your browser.
+
 Pravaah is a live **digital twin of a congested railway section** with two brains running side-by-side: an **AI optimizer** that decides train precedence to minimise weighted delay, and the **first-come-first-served** logic that mirrors how Indian Railways sections are dispatched **manually today**. Flip between them and watch the difference — and, crucially, **read *why* the AI made every call, in plain language.**
 
 ![Pravaah control room](docs/screenshots/control-room.png)
