@@ -41,7 +41,7 @@ export default function App() {
       <TourOverlay caption={tour.caption} onStop={tour.stop} />
       <SafetyFlash show={flash} />
 
-      <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-auto p-3 lg:grid-cols-[1fr_minmax(360px,400px)] lg:overflow-hidden">
+      <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-auto p-3 lg:grid-cols-[1fr_minmax(360px,400px)]">
         {/* left column */}
         <div className="flex min-h-0 flex-col gap-3">
           <div className="panel-in">
@@ -53,6 +53,9 @@ export default function App() {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b hairline px-4 py-2.5">
               <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink">Live Section Control Board</span>
               <span className="text-[11px] text-muted">{BALASORE_CORRIDOR.subtitle}</span>
+              <span className="rounded-full border border-edge/70 bg-black/30 px-2 py-0.5 text-[9px] font-medium uppercase tracking-[0.12em] text-muted/80">
+                Real stations &amp; timetable · movements simulated
+              </span>
               <div className="ml-auto flex flex-wrap items-center gap-2.5">
                 {LEGEND_CLASSES.map((cl) => (
                   <span key={cl} className="inline-flex items-center gap-1 text-[9px] text-muted">

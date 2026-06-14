@@ -31,3 +31,21 @@ export const CLASS_META: Record<TrainClass, ClassMeta> = {
 }
 
 export const classWeight = (cls: TrainClass) => CLASS_WEIGHT[cls]
+
+/**
+ * Representative on-board passenger loadings per class, used only to translate
+ * saved train-minutes into passenger-minutes for the impact headline. These are
+ * order-of-magnitude figures from typical Indian Railways rake compositions
+ * (e.g. a 16-coach Vande Bharat seats ~1,128; an unreserved passenger rake packs
+ * far more), not a claim about any specific service. Goods carry none.
+ */
+export const CLASS_PAX: Record<TrainClass, number> = {
+  SPECIAL: 1100,
+  SUPERFAST: 1500,
+  MAIL: 1800,
+  EXPRESS: 1800,
+  PASSENGER: 2400,
+  GOODS: 0,
+}
+
+export const classPax = (cls: TrainClass) => CLASS_PAX[cls]

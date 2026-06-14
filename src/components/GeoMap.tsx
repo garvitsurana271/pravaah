@@ -34,7 +34,14 @@ type TrainPt = { id: string; color: string; x: number; y: number }
 function MapView({ vb, focused, trains, onToggle, big }: { vb: number[]; focused: boolean; trains: TrainPt[]; onToggle: () => void; big?: boolean }) {
   return (
     <svg viewBox={vb.join(' ')} className="h-full w-full cursor-pointer" onClick={onToggle} role="img" aria-label="National rail network. Click to focus the corridor.">
-      <path d={nationalDots} stroke="rgba(150,172,208,0.55)" strokeWidth={1.6} strokeLinecap="round" fill="none" vectorEffect="non-scaling-stroke" />
+      <path
+        d={nationalDots}
+        stroke={big ? 'rgba(176,198,232,0.8)' : 'rgba(150,172,208,0.55)'}
+        strokeWidth={big ? 2.8 : 1.6}
+        strokeLinecap="round"
+        fill="none"
+        vectorEffect="non-scaling-stroke"
+      />
       <circle cx={ccx} cy={ccy} r={26} fill="none" stroke="rgba(34,211,122,0.35)" strokeWidth={1} vectorEffect="non-scaling-stroke" className={focused ? '' : 'animate-blip'} />
       <polyline points={corridorPath} fill="none" stroke="#22d37a" strokeWidth={2} vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 4px #22d37a)' }} />
       {stations.map((s) => (
@@ -122,7 +129,7 @@ export function GeoMap({ snap }: { snap: Snapshot }) {
               {focused ? 'Full network' : 'Focus route'}
             </button>
             <button
-              onClick={(e) => { e.stopPropagation(); setExpanded(true) }}
+              onClick={(e) => { e.stopPropagation(); setFocused(false); setVb(FULL); setExpanded(true) }}
               aria-label="Expand map"
               className="cursor-pointer rounded-md border border-edge bg-black/55 p-1 text-muted backdrop-blur transition-colors hover:text-ink"
             >

@@ -129,6 +129,7 @@ export function DispatcherPanel({
 function DecisionCard({ d, lookup }: { d: Decision; lookup: ReturnType<typeof buildLookup> }) {
   const exp = explainDecision(d, lookup)
   const isSafety = d.kind === 'SAFETY_REFUSAL'
+  const num = (id: string) => lookup.get(id)?.number ?? id
   const chosen = d.options.find((o) => o.order.join() === d.chosenOrder.join())
   const maxCost = Math.max(1, ...d.options.map((o) => o.weightedCostSec))
 
@@ -149,20 +150,30 @@ function DecisionCard({ d, lookup }: { d: Decision; lookup: ReturnType<typeof bu
       </ul>
       {exp.safety && <div className="mt-2 rounded bg-signal-red/10 px-2 py-1.5 text-[10px] leading-relaxed text-signal-red/90">{exp.safety}</div>}
 
-      {/* option comparison — what the optimizer weighed */}
-      {d.options.length > 1 && (
-        <div className="mt-2.5 space-y-1">
-          <div className="text-[9px] uppercase tracking-[0.16em] text-muted/70">Orderings weighed</div>
+      {/* option comparison — the explicit trade the optimizer weighed, side by side */}
+      {d.options.length > 1 && chosen && (
+        <div className="mt-2.5 space-y-1.5">
+          <div className="text-[9px] uppercase tracking-[0.16em] text-muted/70">What the optimizer weighed</div>
           {d.options.slice(0, 3).map((o) => {
             const win = o === chosen
-            const lead = lookup.get(o.order[0])?.number ?? o.order[0]
+            const held = o.order.slice(1).map(num).join(', ')
+            const deltaWm = minsInt(o.weightedCostSec - chosen.weightedCostSec)
             return (
-              <div key={o.order.join()} className="flex items-center gap-2">
-                <span className={`tabular w-24 shrink-0 text-[10px] ${win ? 'text-signal-green' : 'text-muted'}`}>
-                  {win ? '✓ ' : ''}
-                  {lead} first
-                </span>
-                <div className="relative h-2.5 flex-1 overflow-hidden rounded bg-black/40">
+              <div
+                key={o.order.join()}
+                className={`rounded-md border px-2 py-1.5 ${win ? 'border-signal-green/40 bg-signal-green/[0.06]' : 'border-edge/60 bg-black/20'}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-[10.5px] font-medium ${win ? 'text-signal-green' : 'text-muted'}`}>
+                    {win ? '✓ ' : ''}Clear {num(o.order[0])}
+                    {held ? `, hold ${held}` : ''}
+                  </span>
+                  <span className="tabular shrink-0 text-[10px] text-muted">
+                    {minsInt(o.weightedCostSec)} wm
+                    {!win && deltaWm > 0 && <span className="text-signal-red/80"> +{deltaWm}</span>}
+                  </span>
+                </div>
+                <div className="relative mt-1 h-1.5 overflow-hidden rounded bg-black/40">
                   <div
                     className="h-full rounded"
                     style={{
@@ -172,10 +183,12 @@ function DecisionCard({ d, lookup }: { d: Decision; lookup: ReturnType<typeof bu
                     }}
                   />
                 </div>
-                <span className="tabular w-16 shrink-0 text-right text-[10px] text-muted">{minsInt(o.weightedCostSec)} wm</span>
               </div>
             )
           })}
+          <div className="text-[9.5px] leading-snug text-muted/70">
+            wm = weighted delay-minutes (minutes × priority). Lowest total wins; the chosen plan is the cheapest for the network.
+          </div>
         </div>
       )}
     </div>
