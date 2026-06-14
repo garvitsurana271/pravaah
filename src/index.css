@@ -63,6 +63,19 @@ body {
 }
 .hairline { border-color: rgba(31, 44, 68, 0.9); }
 
+/* elevation tiers: raised (hero / glass-box) sits forward, recessed (ambient) sits back */
+.panel-raised {
+  background: linear-gradient(180deg, rgba(23, 34, 56, 0.96), rgba(14, 22, 39, 0.96));
+  border: 1px solid rgba(58, 110, 180, 0.32);
+  border-radius: 0.8rem;
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.panel-recessed {
+  background: rgba(7, 12, 22, 0.55);
+  border: 1px solid rgba(31, 44, 68, 0.6);
+  border-radius: 0.75rem;
+}
+
 @keyframes blip {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }

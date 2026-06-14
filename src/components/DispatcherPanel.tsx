@@ -41,14 +41,17 @@ export function DispatcherPanel({
   }, [messages])
 
   return (
-    <div className="panel-card flex h-full flex-col overflow-hidden">
-      <div className="flex items-center justify-between border-b hairline px-3 py-2.5">
-        <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
-          <Brain size={15} className="text-signal-green" /> Glass-Box Dispatcher
-        </span>
-        <span className={`tabular rounded px-1.5 py-0.5 text-[9px] font-bold ${optimizerOn ? 'bg-signal-green/15 text-signal-green' : 'bg-muted/15 text-muted'}`}>
-          {optimizerOn ? 'OPTIMIZER' : 'FCFS BASELINE'}
-        </span>
+    <div className="panel-raised flex h-full flex-col overflow-hidden">
+      <div className="border-b hairline px-3 py-2.5">
+        <div className="flex items-center justify-between">
+          <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
+            <Brain size={15} className="text-signal-green" /> Glass-Box Dispatcher
+          </span>
+          <span className={`tabular rounded px-1.5 py-0.5 text-[9px] font-bold ${optimizerOn ? 'bg-signal-green/15 text-signal-green' : 'bg-muted/15 text-muted'}`}>
+            {optimizerOn ? 'OPTIMIZER' : 'FCFS BASELINE'}
+          </span>
+        </div>
+        <div className="mt-1 text-[10px] font-medium text-signal-green/80">Every dispatch decision in plain English. No black box.</div>
       </div>
 
       {/* Latest decision — the reasoning, grounded in the solver's own numbers */}

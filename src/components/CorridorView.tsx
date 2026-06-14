@@ -227,7 +227,10 @@ function TrainGlyph({
   const movingRight = t.direction === 'UP'
   const held = t.state === 'HELD'
   return (
-    <g transform={`translate(${x - w / 2}, ${y - h / 2})`} onClick={() => onSelect(selected ? null : t.id)} style={{ cursor: 'pointer' }} className="animate-rise">
+    <g
+      onClick={() => onSelect(selected ? null : t.id)}
+      style={{ transform: `translate(${x - w / 2}px, ${y - h / 2}px)`, transition: 'transform 0.16s linear', cursor: 'pointer' }}
+    >
       {selected && <rect x={-4} y={-4} width={w + 8} height={h + 8} rx={6} fill="none" stroke="#e6edf7" strokeWidth={1.5} />}
       <rect
         x={0}

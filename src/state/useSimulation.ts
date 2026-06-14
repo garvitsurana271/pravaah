@@ -68,6 +68,7 @@ export function useSimulation(): SimController {
 
   const raf = useRef<number | null>(null)
   const lastTs = useRef<number | null>(null)
+  const lastPub = useRef(0)
   const playingRef = useRef(playing)
   const speedRef = useRef(speed)
   playingRef.current = playing
@@ -92,8 +93,14 @@ export function useSimulation(): SimController {
           sims.current.fcfs.step(step)
           budget -= step
         }
-        publish()
-        if (isDone(sims.current.opt.snapshot()) && isDone(sims.current.fcfs.snapshot())) {
+        // Publish at ~12fps; the train glyphs glide between updates with a CSS
+        // transition, so motion looks smooth while React work stays cheap.
+        const done = isDone(sims.current.opt.snapshot()) && isDone(sims.current.fcfs.snapshot())
+        if (ts - lastPub.current >= 80 || done) {
+          publish()
+          lastPub.current = ts
+        }
+        if (done) {
           setPlaying(false)
           setFinished(true)
         }
