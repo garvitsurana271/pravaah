@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --grid: rgba(58, 160, 255, 0.06);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: #020617;
+  /* faint engineering grid + corner glows = control-room atmosphere */
+  background-image:
+    radial-gradient(1100px 620px at 82% -8%, rgba(34, 211, 122, 0.07), transparent 60%),
+    radial-gradient(900px 560px at -6% 108%, rgba(58, 160, 255, 0.07), transparent 55%),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: auto, auto, 44px 44px, 44px 44px;
+  color: #e6edf7;
+  font-family: 'Fira Sans', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.01em;
+}
+
+*::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #233252;
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-family: 'Fira Code', ui-monospace, monospace;
+}
+
+/* Signal glows */
+.glow-green { filter: drop-shadow(0 0 6px rgba(34, 211, 122, 0.85)); }
+.glow-amber { filter: drop-shadow(0 0 6px rgba(255, 176, 46, 0.85)); }
+.glow-red { filter: drop-shadow(0 0 7px rgba(255, 77, 77, 0.95)); }
+.glow-blue { filter: drop-shadow(0 0 6px rgba(58, 160, 255, 0.8)); }
+
+.text-glow { text-shadow: 0 0 12px currentColor; }
+
+/* Panel chrome */
+.panel-card {
+  background: linear-gradient(180deg, rgba(19, 28, 46, 0.92), rgba(13, 19, 32, 0.92));
+  border: 1px solid rgba(31, 44, 68, 0.9);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(6px);
+}
+.hairline { border-color: rgba(31, 44, 68, 0.9); }
+
+@keyframes blip {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+.animate-blip { animation: blip 1.05s ease-in-out infinite; }
+
+@keyframes dash {
+  to { stroke-dashoffset: -16; }
+}
+.animate-dash { animation: dash 0.9s linear infinite; }
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-rise { animation: riseIn 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blip, .animate-dash, .animate-rise { animation: none !important; }
+}
