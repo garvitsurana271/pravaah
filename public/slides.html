@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pravaah Deck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #020617;
+        --ink: #eef3fb;
+        --muted: #93a7c6;
+        --green: #22d37a;
+        --blue: #3aa0ff;
+        --red: #ff5050;
+        --amber: #ffb02e;
+        --edge: rgba(58, 110, 180, 0.22);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #0a0f1a; font-family: 'Inter', sans-serif; }
+      .slide {
+        width: 1920px;
+        height: 1080px;
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(1400px 820px at 84% -12%, rgba(34, 211, 122, 0.1), transparent 58%),
+          radial-gradient(1200px 740px at -8% 112%, rgba(58, 160, 255, 0.1), transparent 55%),
+          var(--bg);
+        color: var(--ink);
+        padding: 120px 140px;
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1px solid #0a0f1a;
+      }
+      .kicker {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        font-size: 26px;
+        text-transform: uppercase;
+      }
+      .mono { font-family: 'JetBrains Mono', monospace; }
+      .grow { flex: 1; }
+      .center { align-items: center; justify-content: center; text-align: center; }
+      .urls {
+        position: absolute;
+        left: 140px;
+        bottom: 70px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 24px;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+      .urls b { color: var(--green); font-weight: 700; }
+      .mark { display: flex; align-items: center; gap: 10px; }
+
+      /* title */
+      .title-name { font-size: 200px; font-weight: 900; letter-spacing: -0.03em; line-height: 0.95; }
+      .title-sub { font-size: 58px; font-weight: 700; color: var(--green); margin-top: 6px; }
+      .title-tag { font-size: 34px; color: var(--muted); margin-top: 34px; max-width: 1200px; line-height: 1.4; }
+
+      /* full-bleed screenshot */
+      .shot-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; }
+      .shot {
+        max-width: 1560px;
+        max-height: 720px;
+        border: 1px solid var(--edge);
+        border-radius: 14px;
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.02);
+      }
+      .caption { font-size: 33px; color: var(--ink); font-weight: 500; max-width: 1500px; text-align: center; line-height: 1.35; }
+
+      /* big number */
+      .bignum { font-size: 420px; font-weight: 900; line-height: 0.9; letter-spacing: -0.04em; }
+      .biglabel { font-size: 52px; font-weight: 800; margin-top: 18px; }
+      .bigsub { font-size: 30px; color: var(--muted); margin-top: 28px; max-width: 1150px; line-height: 1.45; }
+
+      /* bullets */
+      .h-title { font-size: 86px; font-weight: 800; letter-spacing: -0.02em; margin-top: 26px; line-height: 1.05; }
+      .bullets { margin-top: 70px; display: flex; flex-direction: column; gap: 42px; max-width: 1560px; }
+      .bullet { display: flex; gap: 28px; align-items: flex-start; font-size: 38px; line-height: 1.35; }
+      .dot { width: 16px; height: 16px; border-radius: 4px; margin-top: 18px; flex: none; }
+      .close-h { font-size: 110px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.02; }
+      .close-s { font-size: 40px; color: var(--green); font-weight: 700; margin-top: 34px; max-width: 1500px; line-height: 1.35; }
+    </style>
+  </head>
+  <body>
+    <!-- 1 TITLE -->
+    <section class="slide" id="s1">
+      <div class="mark">
+        <svg width="46" height="46" viewBox="0 0 20 20">
+          <rect x="8.6" y="2.5" width="2.8" height="15" rx="1.4" fill="#2a3a57" />
+          <circle cx="10" cy="6" r="2.9" fill="#22d37a" />
+          <circle cx="10" cy="13.2" r="2.9" fill="#ff5050" opacity="0.32" />
+        </svg>
+        <span class="kicker" style="color: var(--blue)">FAR AWAY 2026 &nbsp;·&nbsp; RAILWAYS</span>
+      </div>
+      <div class="grow" style="display: flex; flex-direction: column; justify-content: center">
+        <div class="title-name">PRAVAAH</div>
+        <div class="title-sub">The Glass-Box Dispatcher</div>
+        <div class="title-tag">
+          An open, explainable AI co-pilot for the person who decides which train waits at every crossing:
+          the Indian Railways section controller. Live and working.
+        </div>
+      </div>
+      <div class="urls"><b>LIVE</b> garvitsurana271.github.io/pravaah &nbsp;&nbsp;&nbsp; <b>CODE</b> github.com/garvitsurana271/pravaah</div>
+    </section>
+
+    <!-- 2 LIVE PRODUCT -->
+    <section class="slide center" id="s2">
+      <div class="shot-wrap">
+        <span class="kicker" style="color: var(--blue)">This is real, and running</span>
+        <img class="shot" src="./_deck/control-room.png" />
+        <div class="caption">Two dispatchers on the same trains: an AI optimizer, and first-come-first-served, the way it is done today.</div>
+      </div>
+    </section>
+
+    <!-- 3 RESULT 20% -->
+    <section class="slide center" id="s3">
+      <span class="kicker" style="color: var(--muted)">The result</span>
+      <div class="bignum" style="color: var(--green); text-shadow: 0 0 80px rgba(34, 211, 122, 0.4); margin-top: 30px">20%</div>
+      <div class="biglabel">less delay than dispatching by hand</div>
+      <div class="bigsub">
+        Same trains, same track. The AI just sets smarter precedence at every crossing. It does not move more
+        trains, it protects the premier ones.
+      </div>
+    </section>
+
+    <!-- 4 GLASS BOX -->
+    <section class="slide center" id="s4">
+      <div class="shot-wrap">
+        <span class="kicker" style="color: var(--green)">What makes it different</span>
+        <img class="shot" src="./_deck/glass-box.png" style="max-width: 720px; max-height: 860px" />
+        <div class="caption">It explains every decision in plain words, built from the optimizer's own numbers. No black box. Ask it anything.</div>
+      </div>
+    </section>
+
+    <!-- 5 SAFETY -->
+    <section class="slide center" id="s5">
+      <div class="shot-wrap">
+        <span class="kicker" style="color: var(--red)">Safe by design</span>
+        <img class="shot" src="./_deck/safety-hold.png" />
+        <div class="caption">It refuses to cause a collision. Here it re-stages the 2 June 2023 Balasore failure, and blocks it.</div>
+      </div>
+    </section>
+
+    <!-- 6 ZERO -->
+    <section class="slide center" id="s6">
+      <span class="kicker" style="color: var(--muted)">The safety floor</span>
+      <div class="bignum" style="color: var(--red); text-shadow: 0 0 80px rgba(255, 80, 80, 0.4); margin-top: 30px">0</div>
+      <div class="biglabel">unsafe states, ever</div>
+      <div class="bigsub">
+        A separate interlocking layer makes a collision impossible, no matter what the AI wants. Balasore, 2023:
+        a route exactly like that killed nearly 300 people.
+      </div>
+    </section>
+
+    <!-- 7 GAP -->
+    <section class="slide" id="s7">
+      <span class="kicker" style="color: var(--green)">Why this matters</span>
+      <div class="h-title">Crore-scale black boxes,<br />or nothing at all</div>
+      <div class="bullets">
+        <div class="bullet"><span class="dot" style="background: var(--amber)"></span><div>India still dispatches every crossing by hand. Punctuality fell from 94% to about 74% in three years.</div></div>
+        <div class="bullet"><span class="dot" style="background: var(--muted)"></span><div style="color: var(--muted)">The AI systems that exist cost over a thousand crore, are closed, and stay advisory, because controllers do not trust a black box.</div></div>
+        <div class="bullet"><span class="dot" style="background: var(--green)"></span><div>Nothing open, explainable, and India-specific exists. That is the gap Pravaah fills.</div></div>
+        <div class="bullet"><span class="dot" style="background: var(--muted)"></span><div style="color: var(--muted)">We avoided reinforcement learning on purpose: the evidence shows classical optimization beats it, and RL has never been deployed.</div></div>
+      </div>
+    </section>
+
+    <!-- 8 REAL + HOW -->
+    <section class="slide" id="s8">
+      <span class="kicker" style="color: var(--blue)">How real, how it works</span>
+      <div class="h-title">Real data, two honest layers</div>
+      <div class="bullets">
+        <div class="bullet"><span class="dot" style="background: var(--green)"></span><div><b>8,697 real Indian stations</b> and real timetabled services, from the open datameet dataset.</div></div>
+        <div class="bullet"><span class="dot" style="background: var(--blue)"></span><div><b>Interlocking layer:</b> one train per block, single lines locked to one direction. Unsafe states impossible, in code.</div></div>
+        <div class="bullet"><span class="dot" style="background: var(--blue)"></span><div><b>Dispatcher layer:</b> the AI only orders moves that are already safe, and writes a full trace for the glass box.</div></div>
+        <div class="bullet"><span class="dot" style="background: var(--muted)"></span><div style="color: var(--muted)">Pure TypeScript, in the browser, 12 passing tests. Movement is simulated, since India has no open live feed; the engine is built to take one.</div></div>
+      </div>
+    </section>
+
+    <!-- 9 CLOSE -->
+    <section class="slide" id="s9">
+      <div class="grow" style="display: flex; flex-direction: column; justify-content: center">
+        <div class="close-h">Open. Explainable.<br />Safe by design.</div>
+        <div class="close-s">The control-room brain Indian Railways does not have yet. Answers problem statement SIH25022, Ministry of Railways.</div>
+      </div>
+      <div class="urls"><b>LIVE</b> garvitsurana271.github.io/pravaah &nbsp;&nbsp;&nbsp; <b>CODE</b> github.com/garvitsurana271/pravaah</div>
+    </section>
+  </body>
+</html>
