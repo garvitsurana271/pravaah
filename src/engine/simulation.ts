@@ -45,6 +45,8 @@ export interface TrainView {
   delaySec: number
   heldReason: string | null
   destCode: string
+  /** Recent [simSec, km-along-corridor] samples, for the time-distance chart. */
+  trail: [number, number][]
 }
 
 export interface SimEvent {
@@ -85,6 +87,8 @@ export class Simulation {
 
   private blocks = new Map<string, string | null>()
   private trainBlockIdx = new Map<string, number>() // train -> the block index it OWNS
+  private trail = new Map<string, [number, number][]>() // train -> [simSec, km] history
+  private lastSampleSec = -1e9
   private edgeLock = new Map<string, { dir: Direction | null; count: number }>()
   private loopHeld = new Map<string, Set<string>>()
   private blockedEdges = new Map<string, number>() // edgeId -> expiry sec
@@ -130,6 +134,28 @@ export class Simulation {
   private blockLen(e: Edge) {
     return e.lengthKm / e.blocks
   }
+  /** Position of a train as chainage (km) along the corridor. */
+  private kmOf(t: Train): number {
+    if (t.pos.kind === 'station') return this.index.stationById.get(t.pos.stationId)!.km
+    const e = this.index.edgeById.get(t.pos.edgeId)!
+    const fromKm = this.index.stationById.get(e.fromId)!.km
+    const toKm = this.index.stationById.get(e.toId)!.km
+    return fromKm + (t.pos.offsetKm / e.lengthKm) * (toKm - fromKm)
+  }
+  private sampleTrails() {
+    if (this.simSec - this.lastSampleSec < 12) return
+    this.lastSampleSec = this.simSec
+    for (const t of this.trains) {
+      if (t.state === 'SCHEDULED' || t.state === 'ARRIVED') continue
+      let arr = this.trail.get(t.def.id)
+      if (!arr) {
+        arr = []
+        this.trail.set(t.def.id, arr)
+      }
+      arr.push([this.simSec, this.kmOf(t)])
+      if (arr.length > 170) arr.shift()
+    }
+  }
   private loopCountAt(stationId: string) {
     return this.loopHeld.get(stationId)?.size ?? 0
   }
@@ -172,6 +198,7 @@ export class Simulation {
     this.spawnScheduled()
     this.processDepartures()
     this.accrueDelays(dtSec)
+    this.sampleTrails()
   }
 
   private applyDisruptions() {
@@ -509,6 +536,7 @@ export class Simulation {
       delaySec: Math.round(t.delaySec),
       heldReason: t.heldReason,
       destCode: this.code(t.def.exitStationId),
+      trail: this.trail.get(t.def.id) ?? [],
     }))
     const blockedEdgeIds = this.corridor.edges.filter((e) => this.isBlocked(e.id)).map((e) => e.id)
     return {

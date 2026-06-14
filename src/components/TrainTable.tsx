@@ -21,6 +21,17 @@ export function TrainTable({ snap, selectedId, onSelect }: { snap: Snapshot; sel
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
         <table className="w-full border-collapse text-left">
+          <thead>
+            <tr className="sticky top-0 z-10 bg-panel2 text-[9px] uppercase tracking-wide text-muted/70">
+              <th className="py-1.5 pl-3" />
+              <th className="py-1.5 pr-2 font-medium">Train</th>
+              <th className="py-1.5 pr-2 font-medium">Service</th>
+              <th className="py-1.5 text-center font-medium">Dir</th>
+              <th className="py-1.5 pr-2 font-medium">State</th>
+              <th className="py-1.5 pr-2 text-right font-medium">km/h</th>
+              <th className="py-1.5 pr-3 text-right font-medium">Delay</th>
+            </tr>
+          </thead>
           <tbody>
             {rows.map((t) => {
               const meta = CLASS_META[t.cls]
@@ -36,7 +47,7 @@ export function TrainTable({ snap, selectedId, onSelect }: { snap: Snapshot; sel
                   </td>
                   <td className="tabular py-1.5 pr-2 text-xs font-semibold text-ink">{t.number}</td>
                   <td className="py-1.5 pr-2">
-                    <div className="max-w-[120px] truncate text-[11px] text-muted">{t.name}</div>
+                    <div className="max-w-[150px] truncate text-[11.5px] text-ink/90">{t.name}</div>
                     <div className="text-[9px] uppercase tracking-wide" style={{ color: meta.color }}>
                       {meta.short} · ×{CLASS_WEIGHT[t.cls]}
                     </div>

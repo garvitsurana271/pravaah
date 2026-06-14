@@ -5,21 +5,23 @@ import { CLASS_META } from '../engine/priorities'
 import type { Direction } from '../engine/types'
 
 const VB_W = 1200
-const VB_H = 300
-const ML = 96
+const VB_H = 232
+const ML = 110
 const MR = 64
 const PLOT_W = VB_W - ML - MR
-const CENTER_Y = 142
-const RAIL_GAP = 18
+const CENTER_Y = 116
+const RAIL_GAP = 50 // UP line and DOWN line are visibly separate tracks
+const UP_Y = CENTER_Y - RAIL_GAP / 2
+const DN_Y = CENTER_Y + RAIL_GAP / 2
 
 const c = BALASORE_CORRIDOR
 const minKm = c.stations[0].km
 const maxKm = c.stations[c.stations.length - 1].km
 const sx = (km: number) => ML + ((km - minKm) / (maxKm - minKm)) * PLOT_W
-const stationByIdEntries = new Map(c.stations.map((s) => [s.id, s]))
+const stationById = new Map(c.stations.map((s) => [s.id, s]))
 const edgeKm = (edgeId: string) => {
   const e = c.edges.find((x) => x.id === edgeId)!
-  return { from: stationByIdEntries.get(e.fromId)!.km, to: stationByIdEntries.get(e.toId)!.km, e }
+  return { from: stationById.get(e.fromId)!.km, to: stationById.get(e.toId)!.km, e }
 }
 
 interface EdgeStatus {
@@ -29,10 +31,7 @@ interface EdgeStatus {
   conflict: 'none' | 'WARN' | 'CRITICAL'
 }
 
-function railY(dir: Direction | 'single'): number {
-  if (dir === 'single') return CENTER_Y
-  return dir === 'UP' ? CENTER_Y - RAIL_GAP / 2 : CENTER_Y + RAIL_GAP / 2
-}
+const railY = (dir: Direction | 'single') => (dir === 'single' ? CENTER_Y : dir === 'UP' ? UP_Y : DN_Y)
 
 export function CorridorView({
   snap,
@@ -76,7 +75,15 @@ export function CorridorView({
   }, [snap])
 
   return (
-    <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="h-full w-full" role="img" aria-label="Live corridor control board">
+    <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="h-full w-full" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Live corridor control board">
+      {/* line labels */}
+      <text x={18} y={UP_Y + 4} className="fill-muted" fontSize={11} fontFamily="Fira Code" fontWeight={600}>
+        UP LINE
+      </text>
+      <text x={18} y={DN_Y + 4} className="fill-muted" fontSize={11} fontFamily="Fira Code" fontWeight={600}>
+        DN LINE
+      </text>
+
       {/* section bands */}
       {c.edges.map((e) => {
         const { from, to } = edgeKm(e.id)
@@ -86,51 +93,48 @@ export function CorridorView({
         const single = e.tracks === 1
         return (
           <g key={e.id}>
-            {/* single-line tunnel band */}
             {single && (
-              <rect
-                x={x1}
-                y={CENTER_Y - 26}
-                width={x2 - x1}
-                height={52}
-                rx={6}
-                fill={st.dir ? 'rgba(58,160,255,0.05)' : 'rgba(148,163,184,0.04)'}
-                stroke="rgba(58,160,255,0.18)"
-                strokeDasharray="3 4"
-              />
-            )}
-            {single && (
-              <text x={(x1 + x2) / 2} y={CENTER_Y - 32} textAnchor="middle" className="fill-signal-blue/70" fontSize={9} fontFamily="Fira Code">
-                SINGLE LINE{st.dir ? ` · ${st.dir} LOCKED` : ''}
-              </text>
-            )}
-            {/* rails */}
-            {single ? (
-              <RailLine x1={x1} x2={x2} y={railY('single')} occupied={st.occupied} dir={st.dir} single />
-            ) : (
               <>
-                <RailLine x1={x1} x2={x2} y={railY('UP')} occupied={st.occupied && st.dir === 'UP'} dir="UP" />
-                <RailLine x1={x1} x2={x2} y={railY('DOWN')} occupied={st.occupied && st.dir === 'DOWN'} dir="DOWN" />
-                {/* block divisions */}
+                <rect
+                  x={x1}
+                  y={CENTER_Y - 18}
+                  width={x2 - x1}
+                  height={36}
+                  rx={7}
+                  fill={st.dir ? 'rgba(58,160,255,0.06)' : 'rgba(148,163,184,0.04)'}
+                  stroke="rgba(58,160,255,0.22)"
+                  strokeDasharray="3 4"
+                />
+                <text x={(x1 + x2) / 2} y={CENTER_Y - 26} textAnchor="middle" className="fill-signal-blue/80" fontSize={10} fontFamily="Fira Code" fontWeight={600}>
+                  SINGLE LINE{st.dir ? ` · ${st.dir} LOCKED` : ''}
+                </text>
+                <RailLine x1={x1} x2={x2} y={CENTER_Y} occupied={st.occupied} dir={st.dir} single />
+              </>
+            )}
+            {!single && (
+              <>
+                <RailLine x1={x1} x2={x2} y={UP_Y} occupied={st.occupied && st.dir === 'UP'} dir="UP" />
+                <RailLine x1={x1} x2={x2} y={DN_Y} occupied={st.occupied && st.dir === 'DOWN'} dir="DOWN" />
                 {Array.from({ length: e.blocks - 1 }).map((_, i) => {
                   const bx = x1 + ((i + 1) / e.blocks) * (x2 - x1)
-                  return <line key={i} x1={bx} y1={CENTER_Y - RAIL_GAP / 2 - 4} x2={bx} y2={CENTER_Y + RAIL_GAP / 2 + 4} stroke="rgba(120,140,170,0.18)" strokeWidth={1} />
+                  return (
+                    <g key={i}>
+                      <line x1={bx} y1={UP_Y - 5} x2={bx} y2={UP_Y + 5} stroke="rgba(120,140,170,0.22)" strokeWidth={1} />
+                      <line x1={bx} y1={DN_Y - 5} x2={bx} y2={DN_Y + 5} stroke="rgba(120,140,170,0.22)" strokeWidth={1} />
+                    </g>
+                  )
                 })}
               </>
             )}
-            {/* disruption overlay */}
             {st.blocked && (
               <g className="animate-blip">
-                <rect x={x1} y={CENTER_Y - 28} width={x2 - x1} height={56} rx={6} fill="rgba(255,77,77,0.12)" stroke="#ff4d4d" strokeDasharray="4 3" />
-                <text x={(x1 + x2) / 2} y={CENTER_Y + 44} textAnchor="middle" className="fill-signal-red glow-red" fontSize={10} fontFamily="Fira Code" fontWeight={700}>
+                <rect x={x1} y={CENTER_Y - 30} width={x2 - x1} height={60} rx={7} fill="rgba(255,77,77,0.13)" stroke="#ff4d4d" strokeDasharray="4 3" />
+                <text x={(x1 + x2) / 2} y={CENTER_Y + 48} textAnchor="middle" className="fill-signal-red glow-red" fontSize={11} fontFamily="Fira Code" fontWeight={700}>
                   ⛔ SECTION BLOCKED
                 </text>
               </g>
             )}
-            {/* conflict marker */}
-            {st.conflict !== 'none' && !st.blocked && (
-              <ConflictTag x={(x1 + x2) / 2} kind={st.conflict} edgeId={e.id} conflicts={snap.conflicts} />
-            )}
+            {st.conflict !== 'none' && !st.blocked && <ConflictTag x={(x1 + x2) / 2} kind={st.conflict} edgeId={e.id} conflicts={snap.conflicts} />}
           </g>
         )
       })}
@@ -141,20 +145,19 @@ export function CorridorView({
         const held = heldByStation.get(s.id) ?? []
         return (
           <g key={s.id}>
-            <line x1={x} y1={CENTER_Y - 30} x2={x} y2={CENTER_Y + 30} stroke="rgba(160,180,210,0.5)" strokeWidth={s.isJunction ? 2.5 : 1.5} />
-            <circle cx={x} cy={CENTER_Y} r={s.isJunction ? 5 : 3.5} fill="#0b1422" stroke="#9fb4dd" strokeWidth={1.5} />
-            {s.isJunction && <circle cx={x} cy={CENTER_Y} r={9} fill="none" stroke="rgba(58,160,255,0.4)" strokeWidth={1} />}
-            <text x={x} y={CENTER_Y + 50} textAnchor="middle" className="fill-ink" fontSize={11} fontFamily="Fira Code" fontWeight={600}>
+            <line x1={x} y1={UP_Y - 12} x2={x} y2={DN_Y + 12} stroke="rgba(160,180,210,0.45)" strokeWidth={s.isJunction ? 2.5 : 1.4} />
+            <circle cx={x} cy={CENTER_Y} r={s.isJunction ? 5.5 : 4} fill="#0b1422" stroke="#9fb4dd" strokeWidth={1.6} />
+            {s.isJunction && <circle cx={x} cy={CENTER_Y} r={10} fill="none" stroke="rgba(58,160,255,0.4)" strokeWidth={1} />}
+            <text x={x} y={DN_Y + 34} textAnchor="middle" className="fill-ink" fontSize={13} fontFamily="Fira Code" fontWeight={600}>
               {s.code}
             </text>
-            <text x={x} y={CENTER_Y + 63} textAnchor="middle" className="fill-muted" fontSize={8.5}>
-              {s.km}km
+            <text x={x} y={DN_Y + 46} textAnchor="middle" className="fill-muted" fontSize={9.5}>
+              {s.km} km
             </text>
-            {/* loop slots (held / dwelling trains park below the station) */}
             {held.map((t, i) => (
               <g key={t.id}>
-                <line x1={x} y1={CENTER_Y + 14} x2={x} y2={CENTER_Y + 66 + i * 20} stroke="rgba(120,140,170,0.2)" strokeWidth={1} strokeDasharray="2 3" />
-                <TrainGlyph x={x} y={CENTER_Y + 70 + i * 20} t={t} selected={selectedId === t.id} onSelect={onSelect} stationParked />
+                <line x1={x - 13} y1={DN_Y + 60 + i * 22} x2={x + 13} y2={DN_Y + 60 + i * 22} stroke="rgba(120,140,170,0.3)" strokeWidth={1} />
+                <TrainGlyph x={x} y={DN_Y + 60 + i * 22} t={t} selected={selectedId === t.id} onSelect={onSelect} stationParked />
               </g>
             ))}
           </g>
@@ -167,7 +170,7 @@ export function CorridorView({
         .map((t) => {
           const { from, to, e } = edgeKm(t.pos.edgeId!)
           const km = from + (t.pos.frac ?? 0) * (to - from)
-          const y = e.tracks === 1 ? railY('single') : railY(t.pos.dir ?? 'UP')
+          const y = e.tracks === 1 ? CENTER_Y : railY(t.pos.dir ?? 'UP')
           return <TrainGlyph key={t.id} x={sx(km)} y={y} t={t} selected={selectedId === t.id} onSelect={onSelect} />
         })}
     </svg>
@@ -175,12 +178,12 @@ export function CorridorView({
 }
 
 function RailLine({ x1, x2, y, occupied, dir, single }: { x1: number; x2: number; y: number; occupied: boolean; dir: Direction | null; single?: boolean }) {
-  const color = occupied ? (dir === 'UP' ? '#3aa0ff' : '#22d3ee') : single ? 'rgba(58,160,255,0.35)' : 'rgba(120,140,170,0.5)'
+  const color = occupied ? (dir === 'UP' ? '#3aa0ff' : '#22d3ee') : single ? 'rgba(58,160,255,0.4)' : 'rgba(120,140,170,0.5)'
   return (
     <>
-      <line x1={x1} y1={y} x2={x2} y2={y} stroke={color} strokeWidth={single ? 3 : 2} strokeLinecap="round" className={occupied ? 'glow-blue' : ''} />
+      <line x1={x1} y1={y} x2={x2} y2={y} stroke={color} strokeWidth={occupied ? 3.5 : single ? 3 : 2.2} strokeLinecap="round" className={occupied ? 'glow-blue' : ''} />
       {occupied && (
-        <line x1={x1} y1={y} x2={x2} y2={y} stroke={color} strokeWidth={single ? 3 : 2} strokeLinecap="round" strokeDasharray="2 10" className="animate-dash" opacity={0.9} />
+        <line x1={x1} y1={y} x2={x2} y2={y} stroke="#eaf4ff" strokeWidth={2} strokeLinecap="round" strokeDasharray="2 11" className="animate-dash" opacity={0.85} />
       )}
     </>
   )
@@ -189,15 +192,16 @@ function RailLine({ x1, x2, y, occupied, dir, single }: { x1: number; x2: number
 function ConflictTag({ x, kind, edgeId, conflicts }: { x: number; kind: 'WARN' | 'CRITICAL'; edgeId: string; conflicts: Snapshot['conflicts'] }) {
   const cf = conflicts.find((cc) => cc.resourceId === edgeId)
   const color = kind === 'CRITICAL' ? '#ff4d4d' : '#ffb02e'
-  const label = cf ? `${cf.kind === 'HEAD_ON' ? 'HEAD-ON' : cf.kind === 'FOLLOWING' ? 'FOLLOWING' : cf.kind} ${Math.max(0, Math.round(cf.etaSec / 60))}m` : 'CONFLICT'
+  const label = cf
+    ? `${cf.kind === 'HEAD_ON' ? 'HEAD-ON' : cf.kind === 'FOLLOWING' ? 'FOLLOWING' : cf.kind} ${Math.max(0, Math.round(cf.etaSec / 60))}m`
+    : 'CONFLICT'
   return (
     <g className={kind === 'CRITICAL' ? 'animate-blip' : ''}>
-      <circle cx={x} cy={CENTER_Y} r={13} fill="none" stroke={color} strokeWidth={1.5} opacity={0.5} />
-      <rect x={x - 46} y={CENTER_Y - 86} width={92} height={18} rx={4} fill="rgba(2,6,23,0.92)" stroke={color} />
-      <text x={x} y={CENTER_Y - 73} textAnchor="middle" fill={color} fontSize={9.5} fontFamily="Fira Code" fontWeight={700}>
+      <rect x={x - 52} y={6} width={104} height={20} rx={5} fill="rgba(2,6,23,0.94)" stroke={color} />
+      <text x={x} y={20} textAnchor="middle" fill={color} fontSize={10.5} fontFamily="Fira Code" fontWeight={700}>
         ⚠ {label}
       </text>
-      <line x1={x} y1={CENTER_Y - 68} x2={x} y2={CENTER_Y - 14} stroke={color} strokeWidth={1} strokeDasharray="2 2" opacity={0.6} />
+      <line x1={x} y1={26} x2={x} y2={CENTER_Y - 24} stroke={color} strokeWidth={1} strokeDasharray="2 3" opacity={0.55} />
     </g>
   )
 }
@@ -218,46 +222,36 @@ function TrainGlyph({
   stationParked?: boolean
 }) {
   const meta = CLASS_META[t.cls]
-  const w = 34
-  const h = 16
+  const w = 42
+  const h = 19
   const movingRight = t.direction === 'UP'
   const held = t.state === 'HELD'
   return (
-    <g
-      transform={`translate(${x - w / 2}, ${y - h / 2})`}
-      onClick={() => onSelect(selected ? null : t.id)}
-      style={{ cursor: 'pointer' }}
-      className="animate-rise"
-    >
+    <g transform={`translate(${x - w / 2}, ${y - h / 2})`} onClick={() => onSelect(selected ? null : t.id)} style={{ cursor: 'pointer' }} className="animate-rise">
       {selected && <rect x={-4} y={-4} width={w + 8} height={h + 8} rx={6} fill="none" stroke="#e6edf7" strokeWidth={1.5} />}
       <rect
         x={0}
         y={0}
         width={w}
         height={h}
-        rx={4}
+        rx={4.5}
         fill={meta.color}
-        opacity={held ? 0.55 : 1}
-        stroke={held ? '#ffb02e' : 'rgba(255,255,255,0.5)'}
-        strokeWidth={held ? 1.5 : 0.75}
-        style={{ filter: `drop-shadow(0 0 5px ${meta.color}aa)` }}
+        opacity={held ? 0.5 : 1}
+        stroke={held ? '#ffb02e' : 'rgba(255,255,255,0.55)'}
+        strokeWidth={held ? 1.6 : 0.75}
+        style={{ filter: `drop-shadow(0 0 6px ${meta.color}aa)` }}
       />
-      {/* direction nose */}
-      <path
-        d={movingRight ? `M${w},2 L${w + 6},${h / 2} L${w},${h - 2} Z` : `M0,2 L-6,${h / 2} L0,${h - 2} Z`}
-        fill={meta.color}
-        opacity={held ? 0.55 : 1}
-      />
-      <text x={w / 2} y={h / 2 + 3.5} textAnchor="middle" fill="#02060f" fontSize={8.5} fontFamily="Fira Code" fontWeight={700}>
+      <path d={movingRight ? `M${w},2 L${w + 7},${h / 2} L${w},${h - 2} Z` : `M0,2 L-7,${h / 2} L0,${h - 2} Z`} fill={meta.color} opacity={held ? 0.5 : 1} />
+      <text x={w / 2} y={h / 2 + 3.6} textAnchor="middle" fill="#02060f" fontSize={10} fontFamily="Fira Code" fontWeight={700}>
         {t.number}
       </text>
       {!stationParked && t.speedKmh > 0 && (
-        <text x={w / 2} y={-5} textAnchor="middle" className="fill-muted" fontSize={8} fontFamily="Fira Code">
+        <text x={w / 2} y={-5} textAnchor="middle" className="fill-muted" fontSize={9} fontFamily="Fira Code">
           {t.speedKmh}
         </text>
       )}
       {held && (
-        <text x={w / 2} y={h + 11} textAnchor="middle" className="fill-signal-amber" fontSize={7.5} fontFamily="Fira Code">
+        <text x={w / 2} y={h + 11} textAnchor="middle" className="fill-signal-amber" fontSize={8.5} fontFamily="Fira Code" fontWeight={600}>
           HELD
         </text>
       )}

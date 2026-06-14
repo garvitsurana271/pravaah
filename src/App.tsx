@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSimulation } from './state/useSimulation'
 import { useTour } from './state/useTour'
-import { TourOverlay, TourNudge } from './components/TourOverlay'
+import { TourOverlay } from './components/TourOverlay'
+import { SafetyFlash } from './components/SafetyFlash'
 import { Topbar } from './components/Topbar'
 import { Kpis } from './components/Kpis'
 import { CorridorView } from './components/CorridorView'
+import { StringLine } from './components/StringLine'
 import { TrainTable } from './components/TrainTable'
 import { GeoMap } from './components/GeoMap'
 import { EventLog } from './components/EventLog'
@@ -18,20 +20,31 @@ export default function App() {
   const ctl = useSimulation()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const tour = useTour(ctl, setSelectedId)
-  const [nudge, setNudge] = useState(true)
+
+  // Fire the "collision prevented" moment whenever the interlocking refuses a route.
+  const [flash, setFlash] = useState(false)
+  const prevUnsafe = useRef(0)
+  const unsafe = ctl.primary.kpis.unsafeAdmissionsPrevented
+  useEffect(() => {
+    if (unsafe > prevUnsafe.current) {
+      setFlash(true)
+      const id = window.setTimeout(() => setFlash(false), 5200)
+      prevUnsafe.current = unsafe
+      return () => window.clearTimeout(id)
+    }
+    prevUnsafe.current = unsafe
+  }, [unsafe])
 
   return (
     <div className="flex h-screen min-h-0 flex-col overflow-hidden">
-      <Topbar ctl={ctl} onStartTour={() => { setNudge(false); tour.start() }} tourActive={tour.active} />
-      {nudge && !tour.active && (
-        <TourNudge onStart={() => { setNudge(false); tour.start() }} onDismiss={() => setNudge(false)} />
-      )}
+      <Topbar ctl={ctl} onStartTour={tour.start} tourActive={tour.active} />
       <TourOverlay caption={tour.caption} onStop={tour.stop} />
+      <SafetyFlash show={flash} />
 
       <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-auto p-3 lg:grid-cols-[1fr_minmax(360px,400px)] lg:overflow-hidden">
         {/* left column */}
         <div className="flex min-h-0 flex-col gap-3">
-          <Kpis optimizer={ctl.optimizer} fcfs={ctl.fcfs} optimizerOn={ctl.optimizerOn} />
+          <Kpis optimizer={ctl.optimizer} fcfs={ctl.fcfs} optimizerOn={ctl.optimizerOn} projected={ctl.projected} />
 
           {/* hero board */}
           <section className="panel-card flex min-h-[360px] flex-1 flex-col overflow-hidden">
@@ -52,8 +65,13 @@ export default function App() {
               </div>
             </div>
             <p className="border-b hairline px-4 py-1.5 text-[11px] leading-relaxed text-muted/80">{ctl.scenario.blurb}</p>
-            <div className="min-h-0 flex-1">
-              <CorridorView snap={ctl.primary} selectedId={selectedId} onSelect={setSelectedId} />
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="min-h-0 flex-[5]">
+                <CorridorView snap={ctl.primary} selectedId={selectedId} onSelect={setSelectedId} />
+              </div>
+              <div className="min-h-0 flex-[4] border-t hairline">
+                <StringLine snap={ctl.primary} />
+              </div>
             </div>
           </section>
 
