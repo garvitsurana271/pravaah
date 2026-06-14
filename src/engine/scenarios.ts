@@ -1,4 +1,16 @@
 import type { Disruption, TrainClass, TrainDef } from './types'
+import corridorTrains from '../data/corridor-trains.json'
+
+interface RealTrain {
+  number: string
+  name: string
+  cls: TrainClass
+  from: string
+  to: string
+  entryMin: number
+  maxSpeedKmh: number
+  stops: string[]
+}
 
 export interface Scenario {
   id: string
@@ -41,18 +53,15 @@ const T = (
 const ORDER = ['kgp', 'jer', 'bst', 'soro', 'bnbr', 'bls', 'rupsa', 'bhc']
 const stationOrder = (id: string) => ORDER.indexOf(id)
 
-// ── Scenario 1 — Peak-hour single-line crossings (the throughput story) ─────
+// ── Scenario 1 — Peak-hour crossings, seeded from the real timetable ─────────
+// Real services that run the Kharagpur–Bhadrak corridor (numbers and names from
+// the open datameet timetable). Directions and gaps are arranged into one peak
+// window so the services interact on screen; the two goods rakes are synthetic,
+// since freight runs no public timetable.
 seq = 0
-const peak: TrainDef[] = [
-  T('NRG7', 'Iron-Ore Goods', 'GOODS', 'kgp', 'bhc', 0.5, 65, []),
-  T('12841', 'Coromandel SF Express', 'SUPERFAST', 'kgp', 'bhc', 1, 130),
-  T('NRG9', 'Steel Goods', 'GOODS', 'bhc', 'kgp', 1.5, 65, []),
-  T('18045', 'East Coast Express', 'EXPRESS', 'bhc', 'kgp', 2, 110, ['rupsa', 'bls', 'soro']),
-  T('22201', 'Puri–Sealdah Duronto', 'SPECIAL', 'bhc', 'kgp', 3.5, 130),
-  T('58421', 'Cuttack Passenger', 'PASSENGER', 'kgp', 'bls', 5, 80, ['jer', 'bst', 'soro', 'bnbr']),
-  T('12703', 'Falaknuma SF Express', 'SUPERFAST', 'kgp', 'bhc', 8, 130),
-  T('12863', 'Howrah SF Express', 'SUPERFAST', 'bhc', 'kgp', 9, 125),
-]
+const peak: TrainDef[] = (corridorTrains as RealTrain[]).map((r) =>
+  T(r.number, r.name, r.cls, r.from, r.to, r.entryMin, r.maxSpeedKmh, r.stops),
+)
 
 // ── Scenario 2 — Disruption recovery (a section fails mid-run) ───────────────
 seq = 100
@@ -83,7 +92,7 @@ const safetyDisruptions: Disruption[] = [
     kind: 'UNSAFE_ROUTE_ATTEMPT',
     trainId: 't202', // Coromandel SF
     edgeId: 'soro-bnbr',
-    note: 'A route was mis-set toward the SORO–BNBR section while the Iron-Ore Goods still occupied it — the exact geometry of the 2 June 2023 Balasore disaster. The interlocking refused the admission.',
+    note: 'A route was set toward the Soro to Bahanaga section while a goods train was still occupying it. This is the exact setup of the 2 June 2023 Balasore disaster. The interlocking refused the admission.',
   },
 ]
 
@@ -92,7 +101,7 @@ export const SCENARIOS: Scenario[] = [
     id: 'peak',
     title: 'Peak-Hour Crossings',
     blurb:
-      'Eight trains, two directions, three single-line sections. Watch the optimizer trade priority against delay at every crossing — then flip it off and see first-come-first-served stall a Superfast behind a goods rake.',
+      'Eight real services run the corridor in both directions across three single-line sections. The optimizer sets precedence at every crossing. Switch it off to watch first-come-first-served stall a Superfast behind a goods train.',
     tickSec: 12,
     trains: peak,
     disruptions: [],
@@ -101,7 +110,7 @@ export const SCENARIOS: Scenario[] = [
     id: 'recovery',
     title: 'Disruption Recovery',
     blurb:
-      'Mid-run, the SORO–BNBR section fails and a Superfast arrives late. The dispatcher re-plans the surviving capacity in real time and narrates every move.',
+      'Mid-run, the Soro to Bahanaga section fails and a Superfast arrives late. The dispatcher re-plans around the lost capacity in real time and logs every move.',
     tickSec: 12,
     trains: recoveryTrains,
     disruptions: recoveryDisruptions,
@@ -110,7 +119,7 @@ export const SCENARIOS: Scenario[] = [
     id: 'safety',
     title: 'Balasore: The Safety Hold',
     blurb:
-      'The 2 June 2023 failure mode, re-staged: a route is mis-set toward an occupied line. Pravaah’s interlocking floor refuses the admission outright — a collision blocked before any AI even decides.',
+      'The 2 June 2023 failure, re-staged. A route is set toward a line that is already occupied. The interlocking refuses the admission, so the collision is blocked before any AI decides.',
     tickSec: 10,
     trains: safetyTrains,
     disruptions: safetyDisruptions,

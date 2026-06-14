@@ -39,7 +39,7 @@ export function explainDecision(d: Decision, lookup: Map<string, TrainLite>): Ex
       headline: `Interlocking refused an unsafe admission for ${name(t)}`,
       rationale: [
         `A route was set that would have admitted ${name(t)} into section ${d.resourceId.toUpperCase()} while it was still occupied.`,
-        `This is the Balasore failure mode — a train sent onto a line that is not clear.`,
+        `This is the Balasore failure mode: a train sent onto a line that is not clear.`,
         `Pravaah's interlocking floor rejected the admission outright and held ${name(t)} at the home signal. No dispatch policy can override this.`,
       ],
       safety: d.safetyNote,
@@ -62,7 +62,7 @@ export function explainDecision(d: Decision, lookup: Map<string, TrainLite>): Ex
     const w = CLASS_WEIGHT[cls(id)]
     const add = chosen.addedDelaySec[id] ?? 0
     const role = id === lead ? 'cleared to proceed' : `held ${mins(add)} min`
-    rationale.push(`${name(id)} — ${clsLabel(id)} (priority ×${w}) → ${role}.`)
+    rationale.push(`${name(id)}, ${clsLabel(id)} (priority weight ${w}): ${role}.`)
   }
 
   if (alt) {
@@ -70,7 +70,7 @@ export function explainDecision(d: Decision, lookup: Map<string, TrainLite>): Ex
     const saving = alt.weightedCostSec - chosen.weightedCostSec
     if (saving > 0) {
       rationale.push(
-        `Reversing the order (clear ${name(alt.order[0])} first) would cost ${mins(alt.weightedCostSec)} weighted-min against ${mins(chosen.weightedCostSec)} chosen — ${factor.toFixed(1)}× worse, because holding the higher-priority train multiplies the lost minutes.`,
+        `Clearing ${name(alt.order[0])} first instead would cost ${mins(alt.weightedCostSec)} weighted-min, versus ${mins(chosen.weightedCostSec)} for this plan. That is about ${factor.toFixed(1)} times worse, because holding the higher-priority train multiplies the minutes lost.`,
       )
     }
   }
@@ -120,7 +120,7 @@ export function answerQuestion(
 
   if (isSafety && !ref) {
     return {
-      text: `Safety floor is active. The interlocking has refused ${kpis.unsafeAdmissionsPrevented} unsafe admission(s) this run — every one a potential collision blocked before it could happen. No two trains can ever occupy the same block, and single-line sections are direction-locked. This guarantee holds regardless of the dispatch policy.`,
+      text: `The safety floor is active. The interlocking has refused ${kpis.unsafeAdmissionsPrevented} unsafe admission(s) this run. Each one is a potential collision stopped before it could happen. No two trains can ever sit in the same block, and single-line sections are locked to one direction. That holds no matter which dispatch policy is running.`,
     }
   }
 
@@ -134,7 +134,7 @@ export function answerQuestion(
         const extra = (alt.weightedCostSec - chosen.weightedCostSec) / 60
         return {
           refDecisionId: d.id,
-          text: `If you override and reverse precedence for ${ref.number}, total weighted delay rises by about ${extra.toFixed(1)} weighted-min — you'd be holding a higher-priority service to favour a lower one. You can do it (human-in-the-loop), but here's the cost so the call is yours, not the machine's.`,
+          text: `If you override and reverse precedence for ${ref.number}, total weighted delay rises by about ${extra.toFixed(1)} weighted-min. You would be holding a higher-priority service to let a lower one go first. You can do it; the controller stays in charge. The number is just there so the call is yours, not the machine's.`,
         }
       }
       return { refDecisionId: d.id, text: `${exp.headline}. ${exp.rationale.slice(0, 3).join(' ')}` }
@@ -146,6 +146,6 @@ export function answerQuestion(
 
   // general status
   return {
-    text: `Right now: ${kpis.conflictsResolved} conflicts resolved, ${kpis.unsafeAdmissionsPrevented} unsafe admissions refused, total weighted delay ${mins(kpis.totalWeightedDelaySec)} weighted-min. Ask me "why is 12841 held?", "what if I override 12863?", or "is the section safe?".`,
+    text: `Right now: ${kpis.conflictsResolved} conflicts resolved, ${kpis.unsafeAdmissionsPrevented} unsafe admissions refused, total weighted delay ${mins(kpis.totalWeightedDelaySec)} weighted-min. Try "why is 12801 held?", "what if I override 12896?", or "is the section safe?".`,
   }
 }

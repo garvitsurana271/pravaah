@@ -49,7 +49,7 @@ export function TourOverlay({ caption, onStop }: { caption: TourCaption | null; 
 
 export function TourNudge({ onStart, onDismiss }: { onStart: () => void; onDismiss: () => void }) {
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-[68px] z-40 flex justify-center px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-5 z-40 flex justify-center px-4">
       <div className="panel-card pointer-events-auto flex items-center gap-3 px-4 py-2 shadow-xl animate-rise" style={{ borderColor: '#22d37a55' }}>
         <span className="hidden text-[12px] text-muted sm:inline">First time here?</span>
         <button

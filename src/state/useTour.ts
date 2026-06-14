@@ -2,8 +2,8 @@ import { useCallback, useRef, useState } from 'react'
 import type { SimController } from './useSimulation'
 
 // A self-driving, captioned product tour. It calls the same controls a human
-// would, so it can never desync from the real simulation — and it gives a solo
-// judge (or a screen recording) the entire story in ~60 seconds, hands-free.
+// would, so it can never desync from the real simulation, and it gives a solo
+// judge (or a screen recording) the whole story in about a minute, hands-free.
 
 export interface TourCaption {
   text: string
@@ -25,8 +25,8 @@ interface Step {
 function buildSteps(): Step[] {
   return [
     {
-      text: 'Pravaah — live control of a congested section near Balasore.',
-      sub: 'Eight trains, both directions, three single-line sections.',
+      text: 'Pravaah controls a busy stretch of track near Balasore.',
+      sub: 'Eight real services, both directions, three single-line sections.',
       tone: 'blue',
       holdMs: 4400,
       run: (ctl, sel) => {
@@ -37,32 +37,30 @@ function buildSteps(): Step[] {
       },
     },
     {
-      text: 'The AI dispatcher resolves every crossing in real time.',
-      sub: 'Minimising weighted delay across the whole section.',
+      text: 'The AI decides who waits at each crossing, in real time, to keep total delay down.',
       tone: 'green',
       holdMs: 8000,
       run: (ctl) => ctl.play(),
     },
     {
-      text: 'Single-line sections lock to one direction — head-on conflicts are flagged before they bite.',
+      text: 'A single-line section carries one train at a time. The board flags a head-on risk before it becomes a problem.',
       tone: 'amber',
       holdMs: 6800,
     },
     {
-      text: 'This is how it’s dispatched today: first-come, first-served.',
-      sub: 'Watch the weighted-delay bar climb.',
+      text: 'This is how it works today: first come, first served. Watch the delay bar climb.',
       tone: 'blue',
       holdMs: 7600,
       run: (ctl) => ctl.setOptimizerOn(false),
     },
     {
-      text: 'The AI cuts weighted delay ~20% — protecting premier trains, not just clearing them in order.',
+      text: 'Switch the AI back on. It cuts delay about 20 percent by giving priority trains a clear run.',
       tone: 'green',
       holdMs: 7600,
       run: (ctl) => ctl.setOptimizerOn(true),
     },
     {
-      text: 'And it explains every decision in plain language — grounded in the solver’s own numbers, not a black box.',
+      text: 'Every call comes with a plain reason, taken from the actual numbers the optimizer used. Ask it anything.',
       tone: 'blue',
       holdMs: 8200,
       run: (ctl, sel) => {
@@ -71,8 +69,7 @@ function buildSteps(): Step[] {
       },
     },
     {
-      text: 'Now the 2 June 2023 Balasore failure, re-staged.',
-      sub: 'A route is mis-set toward an already-occupied line.',
+      text: 'Now the 2 June 2023 Balasore setup: a route is set toward a line that is already occupied.',
       tone: 'red',
       holdMs: 5600,
       run: (ctl, sel) => {
@@ -83,12 +80,12 @@ function buildSteps(): Step[] {
       },
     },
     {
-      text: 'The interlocking REFUSES the admission. A collision — blocked before any AI even decides.',
+      text: 'The interlocking refuses it. The collision is blocked before the AI even gets to decide.',
       tone: 'red',
       holdMs: 8000,
     },
     {
-      text: 'Open. Explainable. Safe by construction. This is Pravaah.',
+      text: 'Open, explainable, and safe by design. That is Pravaah.',
       sub: 'github.com/garvitsurana271/pravaah',
       tone: 'green',
       holdMs: 6500,

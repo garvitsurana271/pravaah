@@ -1,7 +1,7 @@
-"""Generates Pravaah-Deck.pptx — the FAR AWAY 2026 submission deck."""
+"""Generates Pravaah-Deck.pptx, the FAR AWAY 2026 submission deck."""
 import os
 from pptx import Presentation
-from pptx.util import Inches, Pt, Emu
+from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 
@@ -9,11 +9,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SHOTS = os.path.join(ROOT, "docs", "screenshots")
 
 BG = RGBColor(0x02, 0x06, 0x17)
-PANEL = RGBColor(0x10, 0x18, 0x2c)
 GREEN = RGBColor(0x22, 0xd3, 0x7a)
 BLUE = RGBColor(0x3a, 0xa0, 0xff)
-AMBER = RGBColor(0xff, 0xb0, 0x2e)
 RED = RGBColor(0xff, 0x4d, 0x4d)
+AMBER = RGBColor(0xff, 0xb0, 0x2e)
 INK = RGBColor(0xe9, 0xf0, 0xfa)
 MUTED = RGBColor(0x9a, 0xb0, 0xcf)
 
@@ -64,8 +63,7 @@ def title(s, text, color=INK, y=0.95, size=40):
 def bullets(s, items, x=0.7, y=2.2, w=6.2, size=18):
     tf = tb(s, Inches(x), Inches(y), Inches(w), Inches(4.6))
     for i, (txt, col) in enumerate(items):
-        p = para(tf, txt, size, col, space=14, first=(i == 0))
-        p.level = 0
+        para(tf, txt, size, col, space=14, first=(i == 0))
 
 
 def pic(s, name, x, y, w):
@@ -82,113 +80,123 @@ def footer(s, text):
 # 1 — TITLE
 s = slide(); bar(s, GREEN)
 tf = tb(s, Inches(0.9), Inches(2.1), Inches(11.5), Inches(3.2))
-para(tf, "FAR AWAY · 2026   ·   RAILWAYS", 15, BLUE, bold=True, font="Consolas", first=True)
+para(tf, "FAR AWAY 2026   ·   RAILWAYS", 15, BLUE, bold=True, font="Consolas", first=True)
 para(tf, "PRAVAAH  प्रवाह", 60, INK, bold=True, space=4)
 para(tf, "The Glass-Box Dispatcher", 30, GREEN, bold=True, space=16)
-para(tf, "An open, explainable, real-time AI train re-dispatch copilot for the Indian Railways section controller.", 19, MUTED)
-footer(s, "github.com/garvitsurana271/pravaah   ·   maps to SIH25022   ·   Garvit Surana & team")
+para(tf, "An open, explainable AI co-pilot for the Indian Railways section controller.", 19, MUTED)
+footer(s, "Live: garvitsurana271.github.io/pravaah   ·   Code: github.com/garvitsurana271/pravaah   ·   Garvit Surana & team")
 
 # 2 — THE TRAGEDY
-s = slide(); bar(s, RED); kicker(s, "the problem · part 1", RED); title(s, "The next Balasore shouldn't depend on one tired controller's memory")
+s = slide(); bar(s, RED); kicker(s, "the problem, part 1", RED)
+title(s, "A signalling failure put two trains on one track")
 bullets(s, [
-    ("2 June 2023 — a single mis-wired signalling circuit sent the Coromandel Express onto an occupied loop line at 128 km/h near Bahanaga Bazar, Balasore.", INK),
-    ("~300 dead. The line had no Kavach.", RED),
-    ("June 2024 — a goods train ran a red signal (SPAD) and killed ten more on the Kanchanjunga Express. Again, no Kavach.", MUTED),
+    ("2 June 2023. A wrongly-wired circuit sent the Coromandel Express onto an occupied loop line at 128 km/h near Bahanaga Bazar, Balasore.", INK),
+    ("Close to 300 people died. The line had no Kavach.", RED),
+    ("A year later a goods train ran a red signal and killed ten more on the Kanchanjunga Express. Again, no Kavach.", MUTED),
 ], w=11.5, size=20)
 
 # 3 — THE DAILY PROBLEM
-s = slide(); bar(s, AMBER); kicker(s, "the problem · part 2", AMBER); title(s, "Indian Railways dispatches every train by hand")
+s = slide(); bar(s, AMBER); kicker(s, "the problem, part 2", AMBER)
+title(s, "Indian Railways still dispatches by hand")
 bullets(s, [
-    ("A human section controller decides every crossing and precedence call from experience.", INK),
-    ("Control-room software (COA, ICMS, NTES) charts and monitors — it does not optimise.", MUTED),
-    ("Punctuality fell 94% (FY20-21) → 73.6% (FY23-24).", AMBER),
-    ("Over 80% of the busiest corridors run above capacity.", AMBER),
+    ("A human section controller decides every crossing and every precedence call from experience.", INK),
+    ("The control-room software draws charts and shows where trains are. It does not make the decision.", MUTED),
+    ("Punctuality fell from 94% to about 74% in three years.", AMBER),
+    ("Most of the busiest corridors now run above their rated capacity.", AMBER),
 ], w=11.5, size=20)
 
-# 4 — THE GAP (novelty)
-s = slide(); bar(s, GREEN); kicker(s, "the gap = our novelty"); title(s, "Proprietary ₹1000-crore black boxes — or nothing")
+# 4 — THE GAP
+s = slide(); bar(s, GREEN); kicker(s, "the gap we fill")
+title(s, "Closed systems that cost crores, or nothing at all")
 bullets(s, [
-    ("Hitachi / Siemens / Alstom sell closed, crore-scale traffic-management systems — and even those stay advisory, because controllers don't trust black boxes.", INK),
-    ("There is NO open, India-specific, explainable tool for this.", GREEN),
-    ("Pravaah's novelty is the stack: open + explainable + India + real-time recovery — not the underlying operations-research.", MUTED),
-    ("We deliberately avoided RL-for-dispatching: the Flatland challenge showed classical OR beats it, and it has never deployed.", MUTED),
-], w=11.5, size=19)
+    ("Hitachi, Siemens and Alstom sell AI traffic management as closed systems above a thousand crore, and even those stay advisory because controllers do not trust a black box.", INK),
+    ("There is no open, India-specific, explainable tool for this.", GREEN),
+    ("Our contribution is the combination, not the math: open, explainable, India-specific, with safety as a hard floor.", MUTED),
+    ("We did not use reinforcement learning on purpose. The evidence (the Flatland challenge) shows classical optimization beats it and RL has never been deployed.", MUTED),
+], w=11.5, size=18)
 
-# 5 — WHAT IT IS (control room)
-s = slide(); bar(s, BLUE); kicker(s, "the product"); title(s, "A live control room for one congested section", size=34)
+# 5 — WHAT IT IS
+s = slide(); bar(s, BLUE); kicker(s, "the product")
+title(s, "A live control room for one busy section", size=34)
 pic(s, "control-room.png", 0.7, 2.05, 12.0)
-footer(s, "Two brains run side-by-side on the same scenario: the AI optimizer and the manual first-come-first-served baseline.")
+footer(s, "Two dispatchers run on the same trains: the AI optimizer, and first-come-first-served, which is how it is done today.")
 
-# 6 — THROUGHPUT A/B
-s = slide(); bar(s, GREEN); kicker(s, "result · throughput"); title(s, "Flip the optimizer off — watch the delay jump", size=34)
+# 6 — RESULT
+s = slide(); bar(s, GREEN); kicker(s, "the result")
+title(s, "Switch the AI off and the delay climbs", size=34)
 bullets(s, [
-    ("Same eight trains, same track. The optimizer minimises Σ (delay × priority-weight).", INK),
-    ("–20% weighted delay vs. the manual FCFS baseline.", GREEN),
-    ("It doesn't move more trains — it protects the premier ones, spending a goods rake's minutes to save a Superfast's.", MUTED),
-    ("13 conflicts auto-resolved. 0 unsafe states. (measured by the test suite)", MUTED),
+    ("Same trains, same track. The optimizer keeps total delay down by setting smart precedence at each crossing.", INK),
+    ("About 20% less delay than the manual first-come-first-served baseline.", GREEN),
+    ("It does not move more trains. It protects the important ones, spending a goods train's minutes to save a Superfast's.", MUTED),
+    ("13 conflicts resolved automatically, zero unsafe states. Measured by the test suite.", MUTED),
 ], w=11.5, size=20)
 
 # 7 — GLASS BOX
-s = slide(); bar(s, GREEN); kicker(s, "the differentiator"); title(s, "It explains every call — in plain language", size=32)
+s = slide(); bar(s, GREEN); kicker(s, "what makes it different")
+title(s, "It explains every call in plain words", size=32)
 bullets(s, [
-    ("Every decision is the solver's own trace, rendered as auditable reasoning — never invented.", INK),
-    ("“Held 18045 (Express, ×3) so the Superfast could cross — reversing would cost 1.7× more.”", GREEN),
-    ("This directly answers why AI dispatching isn't adopted: black-box distrust.", MUTED),
+    ("Every decision is the optimizer's own working, written out. Nothing is invented.", INK),
+    ("\"Held the Express 11 min so the Superfast could cross. Reversing it would cost 1.7 times more.\"", GREEN),
+    ("This answers why AI dispatching is not adopted today: controllers do not trust black boxes.", MUTED),
 ], x=0.7, y=2.0, w=5.7, size=17)
 pic(s, "glass-box.png", 6.7, 1.7, 6.0)
 
 # 8 — COPILOT
-s = slide(); bar(s, BLUE); kicker(s, "interrogate it"); title(s, "Ask the dispatcher anything — offline", size=32)
+s = slide(); bar(s, BLUE); kicker(s, "you can question it")
+title(s, "Ask the dispatcher anything, offline", size=32)
 bullets(s, [
-    ("“Why is 12841 held?”  “Is the section safe?”  “What's the cost of overriding?”", INK),
-    ("Grounded in the same decision trace. No network call — the demo cannot break.", MUTED),
-    ("The controller stays in command; the machine just shows the cost of each choice.", MUTED),
+    ("\"Why is 12801 held?\"  \"Is the section safe?\"  \"What would an override cost?\"", INK),
+    ("Answers come from the same decision trace. No network call, so the demo cannot break.", MUTED),
+    ("The controller stays in charge. The machine just shows the cost of each choice.", MUTED),
 ], x=0.7, y=2.0, w=5.7, size=17)
 pic(s, "glass-box.png", 6.7, 1.7, 6.0)
 
 # 9 — SAFETY FLOOR
-s = slide(); bar(s, RED); kicker(s, "the safety floor", RED); title(s, "Unsafe states are impossible by construction", size=32)
+s = slide(); bar(s, RED); kicker(s, "the safety floor", RED)
+title(s, "It cannot cause a collision, by design", size=32)
 bullets(s, [
-    ("A separate interlocking layer enforces one-train-per-block and single-line direction-locks — independent of any AI policy.", INK),
-    ("Re-stage the Balasore failure: a route mis-set toward an occupied line is REFUSED.", RED),
-    ("Safety is a hard invariant; the AI only optimises within the safe envelope.", MUTED),
+    ("A separate interlocking layer enforces one train per block and locks single lines to one direction, no matter what the AI does.", INK),
+    ("Re-stage the Balasore failure: a route set toward an occupied line is refused.", RED),
+    ("Safety is a hard floor. The AI only optimizes inside what is already safe.", MUTED),
 ], x=0.7, y=2.0, w=5.6, size=16)
 pic(s, "safety-hold.png", 6.6, 1.7, 6.1)
 
-# 10 — ARCHITECTURE
-s = slide(); bar(s, BLUE); kicker(s, "how it works"); title(s, "Two separated layers")
+# 10 — REAL DATA
+s = slide(); bar(s, BLUE); kicker(s, "how real it is")
+title(s, "Real stations, real trains, honest simulation")
 bullets(s, [
-    ("INTERLOCKING (safety) — one train per block · single-line direction-lock · loop limits. Unsafe = impossible.", GREEN),
-    ("DISPATCHER (policy) — OPTIMIZER vs FCFS; minimises weighted delay; emits a decision trace.", BLUE),
-    ("GLASS-BOX ENGINE — turns that trace into plain language + answers questions.", INK),
-    ("Deterministic, tick-based, pure TypeScript. 100% client-side — no backend, no API keys.", MUTED),
-], w=11.5, size=19)
+    ("The national map is 8,697 real Indian stations with real coordinates, from the open datameet dataset.", GREEN),
+    ("The trains are real services that run this corridor, pulled from the open timetable.", INK),
+    ("Live movement is simulated. India has no open real-time feed, so nobody can do live positions without faking them.", MUTED),
+    ("The engine is built to sit on a real feed the day a railway grants access.", MUTED),
+], w=11.5, size=18)
 
-# 11 — MAPS TO SIH25022
-s = slide(); bar(s, GREEN); kicker(s, "validated demand"); title(s, "We built the Ministry's own flagship problem")
+# 11 — HOW IT WORKS
+s = slide(); bar(s, BLUE); kicker(s, "how it works")
+title(s, "Two layers, kept separate")
 bullets(s, [
-    ("SIH25022 (Smart India Hackathon, Ministry of Railways):", MUTED),
-    ("“Maximizing section throughput through AI-powered, real-time train traffic control.”", GREEN),
-    ("Complementary to Kavach: Kavach is the safety-certified anti-collision floor; Pravaah is the throughput-and-explainability layer above it.", INK),
-], w=11.5, size=20)
+    ("Interlocking (safety): one train per block, single lines locked to one direction. Unsafe states are impossible here, in code.", GREEN),
+    ("Dispatcher (policy): the AI only picks the order among options that are already safe, and writes down a full trace.", BLUE),
+    ("Explanation engine: turns that trace into plain English, grounded in real numbers.", INK),
+    ("Pure TypeScript, 100% in the browser, no backend, no API keys, 12 passing tests.", MUTED),
+], w=11.5, size=18)
 
-# 12 — TECH + RIGOR
-s = slide(); bar(s, BLUE); kicker(s, "engineering"); title(s, "Built to be inspected")
+# 12 — SIH + KAVACH
+s = slide(); bar(s, GREEN); kicker(s, "it answers a real ask")
+title(s, "The Ministry's own problem statement")
 bullets(s, [
-    ("React 18 + TypeScript + Vite + Tailwind + SVG. Bundled fonts → fully offline.", INK),
-    ("12 passing tests: safety invariants, deadlock-freedom, optimizer-beats-FCFS, the safety refusal.", GREEN),
-    ("Real Indian station names & coordinates from the open datameet/railways dataset (CC0).", MUTED),
-    ("One command to run: npm install && npm run dev.", MUTED),
+    ("SIH25022, Ministry of Railways: \"Maximizing section throughput through AI-powered, real-time train traffic control.\"", GREEN),
+    ("It sits alongside Kavach, not against it. Kavach is the safety-certified anti-collision layer. Pravaah is the throughput and explainability layer above it.", INK),
+    ("It is a prototype and a decision-support concept, not certified train control. We say so plainly.", MUTED),
 ], w=11.5, size=19)
-pic(s, "disruption.png", 7.4, 4.4, 5.4)
 
 # 13 — CLOSE
 s = slide(); bar(s, GREEN)
 tf = tb(s, Inches(0.9), Inches(2.3), Inches(11.5), Inches(3))
 para(tf, "Pravaah · प्रवाह", 44, INK, bold=True, first=True)
-para(tf, "Open. Explainable. Safe by construction. The control-room brain Indian Railways doesn't have yet.", 22, GREEN, bold=True, space=18)
-para(tf, "Honest scope: a decision-support prototype — complementary to, not a replacement for, India's safety-certified train control.", 15, MUTED)
-footer(s, "github.com/garvitsurana271/pravaah   ·   FAR AWAY 2026   ·   Railways   ·   SIH25022")
+para(tf, "Open. Explainable. Safe by design. The control-room brain Indian Railways does not have yet.", 22, GREEN, bold=True, space=18)
+para(tf, "Try it live, then read the code. Both links below.", 15, MUTED)
+footer(s, "garvitsurana271.github.io/pravaah   ·   github.com/garvitsurana271/pravaah   ·   FAR AWAY 2026")
 
 out = os.path.join(ROOT, "Pravaah-Deck.pptx")
 prs.save(out)

@@ -143,6 +143,7 @@ export interface Conflict {
   resourceId: string
   trainIds: string[]
   etaSec: number // seconds until the contention materialises
+  risk: number // 0..1 transparent collision-risk score (rises as the contest nears)
   severity: 'INFO' | 'WARN' | 'CRITICAL'
 }
 

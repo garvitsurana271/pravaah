@@ -55,19 +55,19 @@ export function Kpis({ optimizer, fcfs, optimizerOn }: { optimizer: Snapshot; fc
       {/* The money tile: live A/B on weighted delay */}
       <div className="panel-card col-span-2 px-3.5 py-3">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] uppercase tracking-[0.18em] text-muted">Weighted delay · glass-box vs FCFS</span>
+          <span className="text-[10px] uppercase tracking-[0.18em] text-muted">Total delay: AI vs manual (today)</span>
           <span className={`tabular text-xs font-bold ${pct >= 0 ? 'text-signal-green' : 'text-signal-red'}`}>
             {pct >= 0 ? '▼' : '▲'} {Math.abs(pct)}%
           </span>
         </div>
         <div className="mt-2 space-y-1.5">
-          <Bar label="OPTIMIZER" value={optW} max={maxW} color="#22d37a" active={optimizerOn} />
-          <Bar label="FCFS" value={fcW} max={maxW} color="#8aa0c0" active={!optimizerOn} />
+          <Bar label="Pravaah AI" value={optW} max={maxW} color="#22d37a" active={optimizerOn} />
+          <Bar label="Manual" value={fcW} max={maxW} color="#8aa0c0" active={!optimizerOn} />
         </div>
         <div className="mt-1 text-[10px] text-muted">
           {saving > 0
-            ? `Priority-aware dispatch saves ${minsInt(saving)} weighted-min of delay.`
-            : 'Running — divergence builds as crossings are resolved.'}
+            ? `Pravaah saves ${minsInt(saving)} delay-minutes versus first-come, first-served.`
+            : 'Running. The gap grows as crossings get resolved.'}
         </div>
       </div>
     </div>
@@ -85,7 +85,7 @@ function Bar({ label, value, max, color, active }: { label: string; value: numbe
           style={{ width: `${pctW}%`, background: color, opacity: active ? 1 : 0.5, boxShadow: active ? `0 0 10px ${color}` : 'none' }}
         />
       </div>
-      <span className="tabular w-20 shrink-0 text-right text-[10px] text-muted">{minsInt(value)} wmin</span>
+      <span className="tabular w-16 shrink-0 text-right text-[10px] text-muted">{minsInt(value)} min</span>
     </div>
   )
 }

@@ -54,7 +54,7 @@ export function DispatcherPanel({
       {/* Latest decision — the reasoning, grounded in the solver's own numbers */}
       <div className="border-b hairline px-3 py-2.5">
         {!focus ? (
-          <div className="py-3 text-center text-[11px] text-muted/70">No dispatch decisions yet — press play to run the section.</div>
+          <div className="py-3 text-center text-[11px] text-muted/70">No dispatch decisions yet. Press Run to start the section.</div>
         ) : (
           <DecisionCard key={focus.id} d={focus} lookup={lookup} />
         )}
@@ -67,8 +67,8 @@ export function DispatcherPanel({
       <div ref={scroller} className="min-h-0 flex-1 space-y-2 overflow-auto px-3 pb-2">
         {messages.length === 0 && (
           <div className="rounded-lg bg-black/30 px-3 py-2 text-[11px] leading-relaxed text-muted">
-            Every decision above is the optimizer's own trace, in plain language — no black box. Interrogate it: ask why a train is
-            held, whether the line is safe, or the cost of overriding.
+            Each decision above is the optimizer's own working, written out in plain words. No black box. Ask why a train is held,
+            whether the line is safe, or what an override would cost.
           </div>
         )}
         {messages.map((m, i) => (
@@ -110,7 +110,7 @@ export function DispatcherPanel({
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g. why is 12841 held?"
+            placeholder="e.g. why is 12801 held?"
             aria-label="Ask the dispatcher"
             className="tabular min-w-0 flex-1 rounded-md border border-edge bg-black/40 px-2.5 py-1.5 text-[11px] text-ink placeholder:text-muted/50 focus:border-signal-blue/70 focus:outline-none"
           />

@@ -1,0 +1,11 @@
+[
+  { "number": "12801", "name": "Purushottam SF Express", "cls": "SUPERFAST", "from": "kgp", "to": "bhc", "entryMin": 1.0, "maxSpeedKmh": 130, "stops": ["bls"] },
+  { "number": "12816", "name": "Nandankanan SF Express", "cls": "SUPERFAST", "from": "kgp", "to": "bhc", "entryMin": 8.0, "maxSpeedKmh": 130, "stops": ["bls"] },
+  { "number": "18410", "name": "Sri Jagannath Express", "cls": "EXPRESS", "from": "kgp", "to": "bhc", "entryMin": 4.5, "maxSpeedKmh": 110, "stops": ["rupsa", "bls", "soro"] },
+  { "number": "58005", "name": "Kharagpur-Khurda Passenger", "cls": "PASSENGER", "from": "kgp", "to": "bls", "entryMin": 3.0, "maxSpeedKmh": 80, "stops": ["jer", "bst", "soro", "bnbr"] },
+  { "number": "12882", "name": "Puri-Howrah Garib Rath", "cls": "SPECIAL", "from": "bhc", "to": "kgp", "entryMin": 3.5, "maxSpeedKmh": 130, "stops": ["bls"] },
+  { "number": "12896", "name": "Puri-Howrah Express", "cls": "SUPERFAST", "from": "bhc", "to": "kgp", "entryMin": 2.0, "maxSpeedKmh": 125, "stops": ["bls"] },
+  { "number": "12888", "name": "Howrah Express", "cls": "SUPERFAST", "from": "bhc", "to": "kgp", "entryMin": 6.5, "maxSpeedKmh": 125, "stops": ["bls"] },
+  { "number": "NRG-IO", "name": "Iron-Ore Goods (freight)", "cls": "GOODS", "from": "kgp", "to": "bhc", "entryMin": 0.5, "maxSpeedKmh": 65, "stops": [] },
+  { "number": "NRG-ST", "name": "Steel Goods (freight)", "cls": "GOODS", "from": "bhc", "to": "kgp", "entryMin": 1.5, "maxSpeedKmh": 65, "stops": [] }
+]

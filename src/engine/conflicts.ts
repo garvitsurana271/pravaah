@@ -10,6 +10,11 @@ interface Approach {
 }
 
 const LOOKAHEAD_SEC = 720
+const RISK_HORIZON = 360
+const clamp01 = (x: number) => Math.max(0, Math.min(1, x))
+/** Transparent risk: rises as the contest nears; near-certain once a train is on the line. */
+const riskFor = (etaSec: number, imminent: boolean) =>
+  imminent ? Math.max(0.92, clamp01((RISK_HORIZON - etaSec) / RISK_HORIZON)) : clamp01((RISK_HORIZON - etaSec) / RISK_HORIZON)
 
 /**
  * Predict where trains will contend for a shared single-line section — head-on
@@ -47,6 +52,7 @@ export function predictConflicts(view: SimView, _simSec: number): Conflict[] {
         resourceId: e.id,
         trainIds: [u.trainId, d.trainId],
         etaSec: Math.round(eta),
+        risk: riskFor(eta, imminent),
         severity: imminent ? 'CRITICAL' : 'WARN',
       })
     } else {
@@ -59,6 +65,7 @@ export function predictConflicts(view: SimView, _simSec: number): Conflict[] {
           resourceId: e.id,
           trainIds: [sorted[0].trainId, sorted[1].trainId],
           etaSec: Math.round(sorted[1].etaSec),
+          risk: riskFor(sorted[1].etaSec, false) * 0.6,
           severity: 'INFO',
         })
       }
